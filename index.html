@@ -1,1173 +1,1969 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Booksify – Read Smarter, Grow Faster</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="assets/icon.png">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --blue: #0164FF;
-    --blue-dark: #0050cc;
-    --blue-light: #3d86ff;
-    --black: #0a0a0a;
-    --off-black: #111111;
-    --surface: #161616;
-    --surface-2: #1e1e1e;
-    --surface-3: #242424;
-    --border: rgba(255,255,255,0.08);
-    --border-hover: rgba(255,255,255,0.15);
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.35);
-    --font: 'Inter', -apple-system, sans-serif;
-    --nav-bg: rgba(10,10,10,0.8);
-    --nav-bg-scrolled: rgba(10,10,10,0.95);
-    --store-apple-bg: #ffffff;
-    --store-apple-color: #000000;
-    --store-apple-hover: #f0f0f0;
-    --store-google-color: #ffffff;
-  }
-
-  @media (prefers-color-scheme: light) {
-    :root {
-      --black: #ffffff;
-      --off-black: #f5f5f7;
-      --surface: #ffffff;
-      --surface-2: #efefef;
-      --surface-3: #e5e5ea;
-      --border: rgba(0,0,0,0.08);
-      --border-hover: rgba(0,0,0,0.18);
-      --text-primary: #0a0a0a;
-      --text-secondary: rgba(0,0,0,0.55);
-      --text-muted: rgba(0,0,0,0.38);
-      --nav-bg: rgba(255,255,255,0.85);
-      --nav-bg-scrolled: rgba(255,255,255,0.97);
-      --store-apple-bg: #0a0a0a;
-      --store-apple-color: #ffffff;
-      --store-apple-hover: #1a1a1a;
-      --store-google-color: #0a0a0a;
-    }
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: var(--font);
-    background: var(--black);
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 0 5%;
-    height: 72px;
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--nav-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    transition: background 0.3s;
-  }
-  nav.scrolled { background: var(--nav-bg-scrolled); }
-  .nav-logo {
-    display: flex; align-items: center; gap: 10px;
-    text-decoration: none;
-  }
-  .nav-logo img {
-    width: 36px; height: 36px; border-radius: 9px;
-  }
-  .nav-logo span {
-    font-size: 18px; font-weight: 700; color: var(--text-primary);
-    letter-spacing: -0.3px;
-  }
-  .nav-right {
-    display: flex; align-items: center; gap: 36px;
-  }
-  .nav-links {
-    display: flex; align-items: center; gap: 36px;
-    list-style: none;
-  }
-  .nav-links a {
-    font-size: 14px; font-weight: 500;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--text-primary); }
-  .nav-cta {
-    display: flex; gap: 10px;
-  }
-  .btn-outline {
-    padding: 9px 20px;
-    font-size: 14px; font-weight: 600;
-    color: var(--text-primary);
-    background: transparent;
-    border: 1px solid var(--border-hover);
-    border-radius: 8px;
-    cursor: pointer; text-decoration: none;
-    transition: all 0.2s;
-  }
-  .btn-outline:hover { border-color: var(--border-hover); background: var(--surface-2); }
-  .btn-primary {
-    padding: 9px 20px;
-    font-size: 14px; font-weight: 600;
-    color: #fff;
-    background: var(--blue);
-    border: 1px solid transparent;
-    border-radius: 8px;
-    cursor: pointer; text-decoration: none;
-    transition: all 0.2s;
-  }
-  .btn-primary:hover { background: var(--blue-dark); }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    padding: 120px 5% 80px;
-    display: flex; align-items: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -200px; left: -200px;
-    width: 700px; height: 700px;
-    background: radial-gradient(circle, rgba(1,100,255,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero-inner {
-    width: 100%; max-width: 1300px; margin: 0 auto;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-  }
-  .hero-left { max-width: 580px; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(1,100,255,0.12);
-    border: 1px solid rgba(1,100,255,0.3);
-    border-radius: 100px;
-    padding: 6px 14px;
-    font-size: 12px; font-weight: 600;
-    color: var(--blue-light);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-  .hero-badge::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--blue-light);
-  }
-  h1.hero-title {
-    font-size: clamp(42px, 5.5vw, 72px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -2px;
-    margin-bottom: 24px;
-    color: var(--text-primary);
-  }
-  h1.hero-title .accent { color: var(--blue); }
-  .hero-sub {
-    font-size: 18px;
-    line-height: 1.65;
-    color: var(--text-secondary);
-    font-weight: 400;
-    margin-bottom: 40px;
-    max-width: 460px;
-  }
-  .hero-actions {
-    display: flex; gap: 14px; flex-wrap: wrap;
-  }
-  .store-btn {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 13px 22px;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.2s;
-    border: 1px solid var(--border-hover);
-  }
-  .store-btn.apple {
-    background: var(--store-apple-bg); color: var(--store-apple-color); border-color: var(--store-apple-bg);
-  }
-  .store-btn.google {
-    background: transparent; color: var(--store-google-color);
-  }
-  .store-btn:hover { transform: translateY(-2px); }
-  .store-btn.apple:hover { background: var(--store-apple-hover); border-color: var(--store-apple-hover); }
-  .store-btn.google:hover { background: rgba(128,128,128,0.1); }
-  .store-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
-  .store-btn-text { display: flex; flex-direction: column; line-height: 1.2; }
-  .store-btn-text small { font-size: 10px; font-weight: 500; opacity: 0.7; }
-  .store-btn-text strong { font-size: 15px; font-weight: 700; }
-  .hero-stats {
-    display: flex; gap: 36px; margin-top: 44px;
-  }
-  .hero-stat strong {
-    display: block; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
-  }
-  .hero-stat span {
-    font-size: 13px; color: var(--text-muted); font-weight: 400;
-  }
-
-  /* HERO RIGHT */
-  .hero-right {
-    display: flex; justify-content: center; align-items: center;
-    position: relative;
-  }
-  .hero-right img {
-    width: 100%;
-    max-width: 640px;
-    height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 40px 80px rgba(1,100,255,0.2));
-  }
-
-  /* SECTION COMMONS */
-  section { padding: 100px 5%; }
-  .section-inner { max-width: 1300px; margin: 0 auto; }
-  .section-label {
-    font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--blue);
-    margin-bottom: 16px;
-  }
-  h2.section-title {
-    font-size: clamp(32px, 4vw, 52px);
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    line-height: 1.08;
-    margin-bottom: 20px;
-  }
-  .section-sub {
-    font-size: 17px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    max-width: 520px;
-  }
-
-  /* HOW IT WORKS */
-  .how { background: var(--off-black); }
-  .how-grid {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 2px;
-    margin-top: 64px;
-    border-radius: 20px; overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .how-card {
-    background: var(--surface);
-    padding: 44px 36px;
-    position: relative;
-    transition: background 0.3s;
-  }
-  .how-card:hover { background: var(--surface-2); }
-  .how-number {
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    color: var(--blue);
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-  .how-icon {
-    width: 52px; height: 52px;
-    border-radius: 14px;
-    background: rgba(1,100,255,0.12);
-    border: 1px solid rgba(1,100,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 24px;
-    font-size: 24px;
-  }
-  .how-card h3 {
-    font-size: 20px; font-weight: 700; letter-spacing: -0.4px;
-    margin-bottom: 12px;
-    line-height: 1.25;
-  }
-  .how-card p {
-    font-size: 14px; line-height: 1.7;
-    color: var(--text-secondary);
-  }
-
-  /* FEATURES */
-  .features-list { display: flex; flex-direction: column; gap: 120px; margin-top: 80px; }
-  .feature-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-  }
-  .feature-row.reverse { direction: rtl; }
-  .feature-row.reverse > * { direction: ltr; }
-  .feature-img {
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .feature-img::before {
-    content: '';
-    position: absolute;
-    bottom: -10px; left: 50%;
-    transform: translateX(-50%);
-    width: 70%; height: 80px;
-    background: radial-gradient(ellipse, rgba(1,100,255,0.22) 0%, transparent 70%);
-    filter: blur(28px);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .feature-img img {
-    width: 100%; max-height: 540px;
-    height: auto; object-fit: contain;
-    display: block; position: relative; z-index: 1;
-    filter: drop-shadow(0 28px 56px rgba(0,0,0,0.55)) drop-shadow(0 4px 16px rgba(1,100,255,0.12));
-    animation: phoneFloat 5s ease-in-out infinite;
-  }
-  .feature-row:nth-child(1) .feature-img img { animation-delay: 0s; }
-  .feature-row:nth-child(2) .feature-img img { animation-delay: -1.8s; }
-  .feature-row:nth-child(3) .feature-img img { animation-delay: -3.2s; }
-  .feature-row:nth-child(4) .feature-img img { animation-delay: -0.9s; }
-  @keyframes phoneFloat {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-14px); }
-  }
-  .feature-content {}
-  .feature-tag {
-    display: inline-block;
-    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--blue);
-    margin-bottom: 18px;
-  }
-  .feature-content h3 {
-    font-size: clamp(26px, 3vw, 40px);
-    font-weight: 800; letter-spacing: -1px;
-    line-height: 1.1; margin-bottom: 18px;
-  }
-  .feature-content p {
-    font-size: 16px; line-height: 1.75;
-    color: var(--text-secondary); margin-bottom: 28px;
-  }
-  .feature-pills {
-    display: flex; flex-wrap: wrap; gap: 8px;
-  }
-  .pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    padding: 6px 14px;
-    font-size: 13px; font-weight: 500;
-    color: var(--text-secondary);
-  }
-  .pill::before {
-    content: '';
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--blue);
-  }
-
-  /* CATEGORIES MARQUEE */
-  .marquee-section { padding: 80px 0; overflow: hidden; background: var(--off-black); }
-  .marquee-label {
-    text-align: center;
-    font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--blue);
-    margin-bottom: 40px;
-  }
-  .marquee-track {
-    display: flex; gap: 16px;
-    animation: marquee 25s linear infinite;
-    width: max-content;
-  }
-  .marquee-track:hover { animation-play-state: paused; }
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .cat-chip {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    padding: 10px 20px;
-    font-size: 14px; font-weight: 500;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    transition: all 0.2s;
-  }
-  .cat-chip:hover { border-color: var(--blue); color: var(--text-primary); }
-  .cat-chip span { font-size: 18px; }
-
-  /* PRICING */
-  .pricing { background: var(--black); }
-  .pricing-header { text-align: center; margin-bottom: 64px; }
-  .pricing-header .section-sub { margin: 0 auto; }
-  .pricing-grid {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
-    max-width: 900px; margin: 0 auto;
-  }
-  .price-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 36px 28px;
-    position: relative;
-    transition: all 0.25s;
-  }
-  .price-card:hover { border-color: var(--border-hover); transform: translateY(-4px); }
-  .price-card.featured {
-    background: var(--blue);
-    border-color: transparent;
-    transform: scale(1.04);
-  }
-  .price-card.featured:hover { transform: scale(1.04) translateY(-4px); }
-  .featured-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.2);
-    border-radius: 100px;
-    padding: 4px 12px;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 24px;
-  }
-  .price-period {
-    font-size: 13px; font-weight: 600;
-    color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
-    margin-bottom: 12px;
-  }
-  .price-card.featured .price-period { color: rgba(255,255,255,0.65); }
-  .price-amount {
-    font-size: 42px; font-weight: 900;
-    letter-spacing: -2px; line-height: 1;
-    margin-bottom: 6px;
-  }
-  .price-amount sup { font-size: 22px; font-weight: 700; vertical-align: top; margin-top: 8px; }
-  .price-note {
-    font-size: 12px; color: var(--text-muted);
-    margin-bottom: 28px;
-  }
-  .price-card.featured .price-note { color: rgba(255,255,255,0.55); }
-  .price-divider {
-    height: 1px; background: var(--border);
-    margin-bottom: 24px;
-  }
-  .price-card.featured .price-divider { background: rgba(255,255,255,0.2); }
-  .price-features {
-    list-style: none;
-    display: flex; flex-direction: column; gap: 12px;
-    margin-bottom: 28px;
-  }
-  .price-features li {
-    display: flex; align-items: flex-start; gap: 10px;
-    font-size: 14px; line-height: 1.5;
-    color: var(--text-secondary);
-  }
-  .price-card.featured .price-features li { color: rgba(255,255,255,0.85); }
-  .check-icon {
-    width: 18px; height: 18px; flex-shrink: 0;
-    border-radius: 50%;
-    background: rgba(1,100,255,0.15);
-    border: 1px solid rgba(1,100,255,0.35);
-    display: flex; align-items: center; justify-content: center;
-    margin-top: 2px;
-  }
-  .price-card.featured .check-icon {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.4);
-  }
-  .check-icon svg { width: 10px; height: 10px; }
-  .btn-price-main {
-    width: 100%;
-    padding: 14px;
-    background: var(--blue);
-    color: #fff;
-    font-size: 15px; font-weight: 700;
-    border: none; border-radius: 12px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    transition: all 0.2s;
-  }
-  .btn-price-main:hover { background: var(--blue-dark); }
-  .price-card.featured .btn-price-main {
-    background: #000; color: #fff;
-  }
-  .price-card.featured .btn-price-main:hover { background: #1a1a1a; }
-  .btn-price-outline {
-    width: 100%;
-    padding: 14px;
-    background: transparent;
-    color: var(--text-primary);
-    font-size: 15px; font-weight: 700;
-    border: 1px solid var(--border-hover); border-radius: 12px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    transition: all 0.2s;
-  }
-  .btn-price-outline:hover { background: var(--surface-2); }
-
-  /* TESTIMONIALS */
-  .testimonials { background: var(--off-black); }
-  .testimonials-header { text-align: center; margin-bottom: 64px; }
-  .testimonials-header .section-sub { margin: 0 auto; }
-  .reviews-grid {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
-  }
-  .review-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    transition: border-color 0.2s;
-  }
-  .review-card:hover { border-color: var(--border-hover); }
-  .review-stars {
-    display: flex; gap: 3px; margin-bottom: 16px;
-    color: #f5a623;
-    font-size: 14px;
-  }
-  .review-text {
-    font-size: 15px; line-height: 1.7;
-    color: var(--text-secondary); margin-bottom: 20px;
-    font-weight: 400;
-  }
-  .reviewer {
-    display: flex; align-items: center; gap: 10px;
-  }
-  .reviewer-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: rgba(1,100,255,0.2);
-    border: 1px solid rgba(1,100,255,0.3);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; color: var(--blue-light);
-  }
-  .reviewer-name { font-size: 14px; font-weight: 600; }
-  .reviewer-role { font-size: 12px; color: var(--text-muted); }
-
-  /* CTA BANNER */
-  .cta-section {
-    padding: 100px 5%;
-    text-align: center;
-    background: var(--black);
-    position: relative;
-    overflow: hidden;
-  }
-  .cta-section::before {
-    content: '';
-    position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
-    width: 800px; height: 600px;
-    background: radial-gradient(ellipse, rgba(1,100,255,0.1) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .cta-inner { max-width: 700px; margin: 0 auto; position: relative; }
-  .cta-inner h2 {
-    font-size: clamp(38px, 5vw, 62px);
-    font-weight: 900; letter-spacing: -2px;
-    line-height: 1.05; margin-bottom: 20px;
-  }
-  .cta-inner p {
-    font-size: 18px; color: var(--text-secondary);
-    margin-bottom: 44px; line-height: 1.6;
-  }
-  .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-
-  /* FOOTER */
-  footer {
-    background: var(--off-black);
-    border-top: 1px solid var(--border);
-    padding: 60px 5% 40px;
-  }
-  .footer-inner { max-width: 1300px; margin: 0 auto; }
-  .footer-top {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    gap: 48px; margin-bottom: 48px;
-    flex-wrap: wrap;
-  }
-  .footer-brand { max-width: 280px; }
-  .footer-logo {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-  }
-  .footer-logo img { width: 32px; height: 32px; border-radius: 8px; }
-  .footer-logo span { font-size: 16px; font-weight: 700; }
-  .footer-brand p {
-    font-size: 13px; color: var(--text-muted); line-height: 1.7;
-  }
-  .footer-links { display: flex; gap: 64px; flex-wrap: wrap; }
-  .footer-col h4 {
-    font-size: 12px; font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase; color: var(--text-muted);
-    margin-bottom: 16px;
-  }
-  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .footer-col a {
-    font-size: 14px; color: var(--text-secondary);
-    text-decoration: none; transition: color 0.2s;
-  }
-  .footer-col a:hover { color: var(--text-primary); }
-  .footer-bottom {
-    border-top: 1px solid var(--border);
-    padding-top: 24px;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 12px;
-  }
-  .footer-bottom p { font-size: 13px; color: var(--text-muted); }
-  .footer-stores { display: flex; gap: 12px; }
-  .store-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 12px; font-weight: 600;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-  .store-badge:hover { background: var(--surface-3); color: var(--text-primary); }
-
-  /* FADE IN ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .fade-up { animation: fadeUp 0.7s ease forwards; opacity: 0; }
-  .delay-1 { animation-delay: 0.1s; }
-  .delay-2 { animation-delay: 0.2s; }
-  .delay-3 { animation-delay: 0.3s; }
-  .delay-4 { animation-delay: 0.45s; }
-  .delay-5 { animation-delay: 0.6s; }
-
-  /* DIVIDER LINE */
-  .thin-divider { height: 1px; background: var(--border); margin: 0 5%; }
-
-  /* RESPONSIVE */
-  @media (max-width: 1024px) {
-    .hero-inner { grid-template-columns: 1fr; gap: 48px; }
-    .hero-right { display: none; }
-    .how-grid { grid-template-columns: 1fr; }
-    .feature-row { grid-template-columns: 1fr; gap: 40px; }
-    .feature-row.reverse { direction: ltr; }
-    .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
-    .price-card.featured { transform: none; }
-    .reviews-grid { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 768px) {
-    nav { padding: 0 20px; }
-    .nav-links { display: none; }
-    .nav-right { gap: 0; }
-    section { padding: 70px 20px; }
-    .hero { padding: 110px 20px 60px; }
-    footer { padding: 48px 20px 32px; }
-    .footer-top { flex-direction: column; }
-    .footer-links { flex-direction: column; gap: 32px; }
-  }
-
-  /* LIGHT MODE COMPONENT OVERRIDES */
-  @media (prefers-color-scheme: light) {
-    .how-card:hover { background: var(--surface-3); }
-    .review-card:hover { border-color: var(--border-hover); }
-    .how-icon {
-      background: rgba(1,100,255,0.08);
-      border-color: rgba(1,100,255,0.18);
-    }
-    .hero-badge {
-      background: rgba(1,100,255,0.08);
-      border-color: rgba(1,100,255,0.2);
-    }
-    .pill::before { background: var(--blue); }
-    .reviewer-avatar {
-      background: rgba(1,100,255,0.1);
-      border-color: rgba(1,100,255,0.2);
-    }
-    .feature-img::before {
-      background: radial-gradient(ellipse, rgba(1,100,255,0.14) 0%, transparent 70%);
-    }
-    .hero::before {
-      background: radial-gradient(circle, rgba(1,100,255,0.07) 0%, transparent 70%);
-    }
-    .cta-section::before {
-      background: radial-gradient(ellipse, rgba(1,100,255,0.07) 0%, transparent 60%);
-    }
-  }
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">
-    <img src="assets/icon.png" alt="Booksify logo">
-    <span>Booksify</span>
-  </a>
-  <div class="nav-right">
-    <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#how">How it works</a></li>
-      <li><a href="#pricing">Pricing</a></li>
-      <li><a href="#reviews">Reviews</a></li>
-    </ul>
-    <div class="nav-cta">
-      <a href="https://apps.apple.com/az/app/booksify/id6759565415" class="btn-primary" target="_blank">Download Free</a>
-    </div>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-left">
-      <div class="hero-badge fade-up delay-1">Book summaries · Audio & Text</div>
-      <h1 class="hero-title fade-up delay-2">
-        Read Smarter,<br><span class="accent">Grow Faster</span>
-      </h1>
-      <p class="hero-sub fade-up delay-3">
-        Get the key ideas from the world's best nonfiction books in 15 minutes. Listen or read — your choice. Turn every commute into a learning session.
-      </p>
-      <div class="hero-actions fade-up delay-4">
-        <a class="store-btn apple" href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.42.07 2.38.74 3.2.8 1.21-.24 2.38-.93 3.67-.84 1.58.13 2.77.74 3.54 1.9-3.27 1.92-2.49 6.13.6 7.35-.68 1.7-1.52 3.36-3.01 4.65M12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-          <div class="store-btn-text">
-            <small>Download on the</small>
-            <strong>App Store</strong>
-          </div>
-        </a>
-        <a class="store-btn google" href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.37.2.79.26 1.21.12l.1-.06 11.03-6.37-2.39-2.4-9.95 8.71zm-1.45-1.09C1.27 22.19 1 21.5 1 20.67V3.33c0-.83.27-1.52.73-2L10.93 12l-9.2 10.67zm15.77-7.62L4.62 21.63 13.55 12l2 2.05-2.05 1.05zm1.31-7.67L4.62 2.37l2.89 2.9L17.5 12c.49-.28.97-.56 1.31-.62z"/></svg>
-          <div class="store-btn-text">
-            <small>Get it on</small>
-            <strong>Google Play</strong>
-          </div>
-        </a>
-      </div>
-      <div class="hero-stats fade-up delay-5">
-        <div class="hero-stat"><strong>500+</strong><span>Book summaries</span></div>
-        <div class="hero-stat"><strong>15 min</strong><span>Per book idea</span></div>
-        <div class="hero-stat"><strong>4.8★</strong><span>App Store rating</span></div>
-      </div>
-    </div>
-    <div class="hero-right fade-up delay-3">
-      <img src="assets/main_hero.png" alt="Booksify app on multiple phones">
-    </div>
-  </div>
-</section>
-
-<div class="thin-divider"></div>
-
-<!-- HOW IT WORKS -->
-<section class="how" id="how">
-  <div class="section-inner">
-    <p class="section-label">How it works</p>
-    <h2 class="section-title">Three steps to<br>daily wisdom</h2>
-    <div class="how-grid">
-      <div class="how-card">
-        <div class="how-number">Step 01</div>
-        <div class="how-icon">📚</div>
-        <h3>Pick a book or category</h3>
-        <p>Browse hundreds of curated summaries across Business, Finance, Self-Help, and more. Discover what top readers are learning this week.</p>
-      </div>
-      <div class="how-card">
-        <div class="how-number">Step 02</div>
-        <div class="how-icon">🎧</div>
-        <h3>Listen or read in 15 minutes</h3>
-        <p>Every summary is available as both audio and text. Sync seamlessly between the two — listen on your commute, read at your desk.</p>
-      </div>
-      <div class="how-card">
-        <div class="how-number">Step 03</div>
-        <div class="how-icon">💡</div>
-        <h3>Learn the words as you go</h3>
-        <p>Tap any word to get instant definitions with translations into your language. Built-in vocabulary learning while you absorb ideas.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="thin-divider"></div>
-
-<!-- CATEGORIES MARQUEE -->
-<div class="marquee-section">
-  <p class="marquee-label">Categories you'll love</p>
-  <div style="overflow: hidden;">
-    <div class="marquee-track" id="marquee">
-      <span class="cat-chip"><span>💼</span> Business</span>
-      <span class="cat-chip"><span>💰</span> Finance</span>
-      <span class="cat-chip"><span>🧠</span> Psychology</span>
-      <span class="cat-chip"><span>🚀</span> Entrepreneurship</span>
-      <span class="cat-chip"><span>🎯</span> Self Help</span>
-      <span class="cat-chip"><span>💻</span> Computer Science</span>
-      <span class="cat-chip"><span>📈</span> Economics</span>
-      <span class="cat-chip"><span>🎨</span> Creativity</span>
-      <span class="cat-chip"><span>🎓</span> Education</span>
-      <span class="cat-chip"><span>🤝</span> Communication</span>
-      <span class="cat-chip"><span>⚖️</span> Decision Making</span>
-      <span class="cat-chip"><span>💼</span> Marketing</span>
-      <span class="cat-chip"><span>🧬</span> Science</span>
-      <span class="cat-chip"><span>🏆</span> Leadership</span>
-      <!-- Duplicated for seamless loop -->
-      <span class="cat-chip"><span>💼</span> Business</span>
-      <span class="cat-chip"><span>💰</span> Finance</span>
-      <span class="cat-chip"><span>🧠</span> Psychology</span>
-      <span class="cat-chip"><span>🚀</span> Entrepreneurship</span>
-      <span class="cat-chip"><span>🎯</span> Self Help</span>
-      <span class="cat-chip"><span>💻</span> Computer Science</span>
-      <span class="cat-chip"><span>📈</span> Economics</span>
-      <span class="cat-chip"><span>🎨</span> Creativity</span>
-      <span class="cat-chip"><span>🎓</span> Education</span>
-      <span class="cat-chip"><span>🤝</span> Communication</span>
-      <span class="cat-chip"><span>⚖️</span> Decision Making</span>
-      <span class="cat-chip"><span>💼</span> Marketing</span>
-      <span class="cat-chip"><span>🧬</span> Science</span>
-      <span class="cat-chip"><span>🏆</span> Leadership</span>
-    </div>
-  </div>
-</div>
-
-<div class="thin-divider"></div>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="section-inner">
-    <p class="section-label">Features</p>
-    <h2 class="section-title">Everything you need<br>to learn every day</h2>
-    <div class="features-list">
-
-      <!-- Feature 1 -->
-      <div class="feature-row">
-        <div class="feature-img">
-          <img src="assets/explore_by_categories.png" alt="Explore screen with book categories">
-        </div>
-        <div class="feature-content">
-          <span class="feature-tag">Discover</span>
-          <h3>Explore hundreds of books by category</h3>
-          <p>Browse a hand-curated library of the world's most impactful books. Filter by Financial Mindset, Self Help, Entrepreneurship, and more. New titles added weekly.</p>
-          <div class="feature-pills">
-            <span class="pill">500+ summaries</span>
-            <span class="pill">New books weekly</span>
-            <span class="pill">Editor-curated</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature 2 -->
-      <div class="feature-row reverse">
-        <div class="feature-img">
-          <img src="assets/audio_and_text_sync.png" alt="Audio player with read-along text">
-        </div>
-        <div class="feature-content">
-          <span class="feature-tag">Listen & Read</span>
-          <h3>Audio and text — perfectly in sync</h3>
-          <p>Follow along as words highlight in real time while audio plays. Switch between reading and listening without losing your place. Control playback speed for faster learning.</p>
-          <div class="feature-pills">
-            <span class="pill">Synchronized highlighting</span>
-            <span class="pill">Speed control</span>
-            <span class="pill">Offline mode</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature 3 -->
-      <div class="feature-row">
-        <div class="feature-img">
-          <img src="assets/learn_new_words.png" alt="Dictionary popup with translation">
-        </div>
-        <div class="feature-content">
-          <span class="feature-tag">Vocabulary</span>
-          <h3>Learn new words in your language</h3>
-          <p>Tap any unfamiliar word while reading and get an instant definition, pronunciation, and translation. Built-in multilingual dictionary helps non-native readers absorb more.</p>
-          <div class="feature-pills">
-            <span class="pill">Tap-to-define</span>
-            <span class="pill">Native translations</span>
-            <span class="pill">Pronunciations</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature 4 -->
-      <div class="feature-row reverse">
-        <div class="feature-img">
-          <img src="assets/curated_reading_path.png" alt="Home screen with collections">
-        </div>
-        <div class="feature-content">
-          <span class="feature-tag">Collections</span>
-          <h3>Curated reading paths for every goal</h3>
-          <p>Collections group books into guided journeys — Maps of Wisdom, Financial Mindset, and more. Follow a structured path or create your own reading plan with weekly goals.</p>
-          <div class="feature-pills">
-            <span class="pill">Guided collections</span>
-            <span class="pill">Reading plans</span>
-            <span class="pill">Progress tracking</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<div class="thin-divider"></div>
-
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="section-inner">
-    <div class="pricing-header">
-      <p class="section-label">Pricing</p>
-      <h2 class="section-title">Simple, honest pricing</h2>
-      <p class="section-sub">Start free. Upgrade anytime. Cancel whenever. No tricks, no lock-ins.</p>
-    </div>
-    <div class="pricing-grid">
-
-      <!-- Weekly -->
-      <div class="price-card">
-        <div class="price-period">Weekly</div>
-        <div class="price-amount"><sup>$</sup>4.99</div>
-        <div class="price-note">per week, billed weekly</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#0164FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Full access to all summaries
-          </li>
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#0164FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Audio & text mode
-          </li>
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#0164FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Built-in dictionary
-          </li>
-        </ul>
-        <a href="https://apps.apple.com/az/app/booksify/id6759565415" class="btn-price-outline" target="_blank">Get started</a>
-      </div>
-
-      <!-- Monthly (featured) -->
-      <div class="price-card featured">
-        <div class="featured-badge">✦ Best Value</div>
-        <div class="price-period">Monthly</div>
-        <div class="price-amount"><sup>$</sup>9.99</div>
-        <div class="price-note">per month, billed monthly</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Everything in Weekly
-          </li>
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Reading plans & goals
-          </li>
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Curated collections
-          </li>
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Offline downloads
-          </li>
-        </ul>
-        <a href="https://apps.apple.com/az/app/booksify/id6759565415" class="btn-price-main" target="_blank">Start for free</a>
-      </div>
-
-      <!-- 3 months -->
-      <div class="price-card">
-        <div class="price-period">3 Months</div>
-        <div class="price-amount"><sup>$</sup>24.99</div>
-        <div class="price-note">every 3 months</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#0164FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Everything in Monthly
-          </li>
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#0164FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Save vs monthly plan
-          </li>
-          <li>
-            <div class="check-icon"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#0164FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            Priority new releases
-          </li>
-        </ul>
-        <a href="https://apps.apple.com/az/app/booksify/id6759565415" class="btn-price-outline" target="_blank">Get started</a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<div class="thin-divider"></div>
-
-<!-- TESTIMONIALS -->
-<section class="testimonials" id="reviews">
-  <div class="section-inner">
-    <div class="testimonials-header">
-      <p class="section-label">Reviews</p>
-      <h2 class="section-title">Loved by readers worldwide</h2>
-      <p class="section-sub">Join thousands of curious minds who grow with Booksify every day.</p>
-    </div>
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"I've always wanted to read more but never had the time. Booksify changed that. I get through 3–4 books a week now — on my commute, at the gym, everywhere."</p>
-        <div class="reviewer">
-          <div class="reviewer-avatar">AH</div>
-          <div><div class="reviewer-name">Anar H.</div><div class="reviewer-role">Software Engineer, Baku</div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"The built-in dictionary with Azerbaijani translations is incredible. I improve my English vocabulary while absorbing knowledge from the best books in the world."</p>
-        <div class="reviewer">
-          <div class="reviewer-avatar">LM</div>
-          <div><div class="reviewer-name">Leyla M.</div><div class="reviewer-role">Marketing Manager</div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Switched from Blinkist and haven't looked back. The audio sync while reading is seamless, the UI is clean, and the book selection is exactly what I need."</p>
-        <div class="reviewer">
-          <div class="reviewer-avatar">RK</div>
-          <div><div class="reviewer-name">Ruslan K.</div><div class="reviewer-role">Entrepreneur</div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"The Collections feature is brilliant. I followed the Financial Mindset path and it completely changed how I think about money. Finished 15 books in a month."</p>
-        <div class="reviewer">
-          <div class="reviewer-avatar">NJ</div>
-          <div><div class="reviewer-name">Nigar J.</div><div class="reviewer-role">Business Analyst</div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Reading plan feature keeps me accountable. Set a weekly goal, get reminders, track progress. It's like having a personal reading coach in my pocket."</p>
-        <div class="reviewer">
-          <div class="reviewer-avatar">TO</div>
-          <div><div class="reviewer-name">Tural O.</div><div class="reviewer-role">Product Manager</div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Best $9.99 I spend every month. The summaries are genuinely insightful — not just dry bullet points. Feels like having a smart friend explain every book to you."</p>
-        <div class="reviewer">
-          <div class="reviewer-avatar">SM</div>
-          <div><div class="reviewer-name">Samira M.</div><div class="reviewer-role">Founder & CEO</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="thin-divider"></div>
-
-<!-- CTA SECTION -->
-<section class="cta-section">
-  <div class="cta-inner">
-    <h2>Start reading smarter<br>today — it's free</h2>
-    <p>Download Booksify and get your first summaries free. No credit card required.</p>
-    <div class="cta-btns">
-      <a class="store-btn apple" href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.42.07 2.38.74 3.2.8 1.21-.24 2.38-.93 3.67-.84 1.58.13 2.77.74 3.54 1.9-3.27 1.92-2.49 6.13.6 7.35-.68 1.7-1.52 3.36-3.01 4.65M12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-        <div class="store-btn-text">
-          <small>Download on the</small>
-          <strong>App Store</strong>
-        </div>
-      </a>
-      <a class="store-btn google" href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.37.2.79.26 1.21.12l.1-.06 11.03-6.37-2.39-2.4-9.95 8.71zm-1.45-1.09C1.27 22.19 1 21.5 1 20.67V3.33c0-.83.27-1.52.73-2L10.93 12l-9.2 10.67zm15.77-7.62L4.62 21.63 13.55 12l2 2.05-2.05 1.05zm1.31-7.67L4.62 2.37l2.89 2.9L17.5 12c.49-.28.97-.56 1.31-.62z"/></svg>
-        <div class="store-btn-text">
-          <small>Get it on</small>
-          <strong>Google Play</strong>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="footer-logo">
-          <img src="assets/icon.png" alt="Booksify">
-          <span>Booksify</span>
-        </div>
-        <p>Learn the key ideas from the world's best books in minutes. Audio, text, and built-in dictionary — all in one app.</p>
-      </div>
-      <div class="footer-links">
-        <div class="footer-col">
-          <h4>Product</h4>
-          <ul>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#how">How it works</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#reviews">Reviews</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Download</h4>
-          <ul>
-            <li><a href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank">iOS App Store</a></li>
-            <li><a href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank">Google Play</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Legal</h4>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Use</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2026 Booksify. All rights reserved.</p>
-      <div class="footer-stores">
-        <a href="https://apps.apple.com/az/app/booksify/id6759565415" class="store-badge" target="_blank">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.42.07 2.38.74 3.2.8 1.21-.24 2.38-.93 3.67-.84 1.58.13 2.77.74 3.54 1.9-3.27 1.92-2.49 6.13.6 7.35-.68 1.7-1.52 3.36-3.01 4.65M12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-          App Store
-        </a>
-        <a href="https://play.google.com/store/apps/details?id=com.booksify.summary" class="store-badge" target="_blank">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.37.2.79.26 1.21.12l.1-.06 11.03-6.37-2.39-2.4-9.95 8.71zm-1.45-1.09C1.27 22.19 1 21.5 1 20.67V3.33c0-.83.27-1.52.73-2L10.93 12l-9.2 10.67zm15.77-7.62L4.62 21.63 13.55 12l2 2.05-2.05 1.05zm1.31-7.67L4.62 2.37l2.89 2.9L17.5 12c.49-.28.97-.56 1.31-.62z"/></svg>
-          Google Play
-        </a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<script>
-  // Intersection Observer for scroll-triggered fade-in
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(el => {
-      if (el.isIntersecting) {
-        el.target.style.opacity = '1';
-        el.target.style.transform = 'translateY(0)';
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booksify – Read Smarter, Grow Faster</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="assets/icon.png" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    });
-  }, { threshold: 0.12 });
 
-  document.querySelectorAll('.how-card, .feature-row, .price-card, .review-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(28px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
-  });
+      :root {
+        --blue: #0164ff;
+        --blue-dark: #0050cc;
+        --blue-light: #3d86ff;
+        --black: #0a0a0a;
+        --off-black: #111111;
+        --surface: #161616;
+        --surface-2: #1e1e1e;
+        --surface-3: #242424;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(255, 255, 255, 0.15);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.6);
+        --text-muted: rgba(255, 255, 255, 0.35);
+        --font: "Inter", -apple-system, sans-serif;
+        --nav-bg: rgba(10, 10, 10, 0.8);
+        --nav-bg-scrolled: rgba(10, 10, 10, 0.95);
+        --store-apple-bg: #ffffff;
+        --store-apple-color: #000000;
+        --store-apple-hover: #f0f0f0;
+        --store-google-color: #ffffff;
+      }
 
-  // Stagger pricing cards
-  document.querySelectorAll('.price-card').forEach((el, i) => {
-    el.style.transitionDelay = `${i * 0.08}s`;
-  });
+      @media (prefers-color-scheme: light) {
+        :root {
+          --black: #ffffff;
+          --off-black: #f5f5f7;
+          --surface: #ffffff;
+          --surface-2: #efefef;
+          --surface-3: #e5e5ea;
+          --border: rgba(0, 0, 0, 0.08);
+          --border-hover: rgba(0, 0, 0, 0.18);
+          --text-primary: #0a0a0a;
+          --text-secondary: rgba(0, 0, 0, 0.55);
+          --text-muted: rgba(0, 0, 0, 0.38);
+          --nav-bg: rgba(255, 255, 255, 0.85);
+          --nav-bg-scrolled: rgba(255, 255, 255, 0.97);
+          --store-apple-bg: #0a0a0a;
+          --store-apple-color: #ffffff;
+          --store-apple-hover: #1a1a1a;
+          --store-google-color: #0a0a0a;
+        }
+      }
 
-  // Nav background on scroll
-  const nav = document.querySelector('nav');
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-  });
-</script>
-</body>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--black);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 0 5%;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--nav-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        transition: background 0.3s;
+      }
+      nav.scrolled {
+        background: var(--nav-bg-scrolled);
+      }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .nav-logo img {
+        width: 44px;
+        height: 44px;
+        border-radius: 11px;
+      }
+      .nav-logo span {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.3px;
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 36px;
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 36px;
+        list-style: none;
+      }
+      .nav-links a {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--text-primary);
+      }
+      .nav-cta {
+        display: flex;
+        gap: 10px;
+      }
+      .btn-outline {
+        padding: 9px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        background: transparent;
+        border: 1px solid var(--border-hover);
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .btn-outline:hover {
+        border-color: var(--border-hover);
+        background: var(--surface-2);
+      }
+      .btn-primary {
+        padding: 9px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--blue);
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .btn-primary:hover {
+        background: var(--blue-dark);
+      }
+
+      /* HERO */
+      .hero {
+        min-height: 100vh;
+        padding: 120px 5% 80px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -200px;
+        left: -200px;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(
+          circle,
+          rgba(1, 100, 255, 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .hero-inner {
+        width: 100%;
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+      }
+      .hero-left {
+        max-width: 580px;
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(1, 100, 255, 0.12);
+        border: 1px solid rgba(1, 100, 255, 0.3);
+        border-radius: 100px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--blue-light);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 28px;
+      }
+      .hero-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--blue-light);
+      }
+      h1.hero-title {
+        font-size: clamp(42px, 5.5vw, 72px);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -2px;
+        margin-bottom: 24px;
+        color: var(--text-primary);
+      }
+      h1.hero-title .accent {
+        color: var(--blue);
+      }
+      .hero-sub {
+        font-size: 18px;
+        line-height: 1.65;
+        color: var(--text-secondary);
+        font-weight: 400;
+        margin-bottom: 40px;
+        max-width: 460px;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      /* Store image buttons */
+      .store-img-btn {
+        display: inline-block;
+        text-decoration: none;
+        flex-shrink: 0;
+        transition: transform 0.2s, opacity 0.2s;
+      }
+      .store-img-btn:hover {
+        transform: translateY(-3px);
+        opacity: 0.88;
+      }
+      .store-img-btn img {
+        display: block;
+        height: 52px;
+        width: auto;
+      }
+      .store-img-btn-sm img {
+        height: 36px;
+      }
+      .hero-stats {
+        display: flex;
+        gap: 36px;
+        margin-top: 44px;
+      }
+      .hero-stat strong {
+        display: block;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .hero-stat span {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      /* HERO RIGHT */
+      .hero-right {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+      }
+      .hero-right img {
+        width: 100%;
+        max-width: 720px;
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 40px 80px rgba(1, 100, 255, 0.22));
+        animation: heroBreathe 6s ease-in-out infinite;
+        transform-origin: center bottom;
+      }
+      @keyframes heroBreathe {
+        0%, 100% { transform: scale(1) translateY(0px); filter: drop-shadow(0 40px 80px rgba(1,100,255,0.22)); }
+        50% { transform: scale(1.03) translateY(-10px); filter: drop-shadow(0 52px 96px rgba(1,100,255,0.32)); }
+      }
+
+      /* SECTION COMMONS */
+      section {
+        padding: 100px 5%;
+      }
+      .section-inner {
+        max-width: 1300px;
+        margin: 0 auto;
+      }
+      .section-label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 16px;
+      }
+      h2.section-title {
+        font-size: clamp(32px, 4vw, 52px);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.08;
+        margin-bottom: 20px;
+      }
+      .section-sub {
+        font-size: 17px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        max-width: 520px;
+      }
+
+      /* HOW IT WORKS */
+      .how {
+        background: var(--off-black);
+      }
+      .how-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+        margin-top: 64px;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .how-card {
+        background: var(--surface);
+        padding: 44px 36px;
+        position: relative;
+        transition: background 0.3s;
+      }
+      .how-card:hover {
+        background: var(--surface-2);
+      }
+      .how-number {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--blue);
+        text-transform: uppercase;
+        margin-bottom: 28px;
+      }
+      .how-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: rgba(1, 100, 255, 0.12);
+        border: 1px solid rgba(1, 100, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        font-size: 24px;
+      }
+      .how-card h3 {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        margin-bottom: 12px;
+        line-height: 1.25;
+      }
+      .how-card p {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+      }
+
+      /* FEATURES */
+      .features-list {
+        display: flex;
+        flex-direction: column;
+        gap: 120px;
+        margin-top: 80px;
+      }
+      .feature-row {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 72px;
+        align-items: center;
+      }
+      .feature-row.reverse {
+        direction: rtl;
+      }
+      .feature-row.reverse > * {
+        direction: ltr;
+      }
+      .feature-img {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .feature-img::before {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        height: 80px;
+        background: radial-gradient(
+          ellipse,
+          rgba(1, 100, 255, 0.22) 0%,
+          transparent 70%
+        );
+        filter: blur(28px);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .feature-img img {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 680px;
+        display: block;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+        filter: drop-shadow(0 32px 64px rgba(0, 0, 0, 0.5))
+          drop-shadow(0 4px 20px rgba(1, 100, 255, 0.14));
+        animation: phoneFloat 5s ease-in-out infinite;
+      }
+      .feature-row:nth-child(1) .feature-img img {
+        animation-delay: 0s;
+      }
+      .feature-row:nth-child(2) .feature-img img {
+        animation-delay: -1.8s;
+      }
+      .feature-row:nth-child(3) .feature-img img {
+        animation-delay: -3.2s;
+      }
+      .feature-row:nth-child(4) .feature-img img {
+        animation-delay: -0.9s;
+      }
+      @keyframes phoneFloat {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-14px);
+        }
+      }
+      .feature-content {
+      }
+      .feature-tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 18px;
+      }
+      .feature-content h3 {
+        font-size: clamp(26px, 3vw, 40px);
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1.1;
+        margin-bottom: 18px;
+      }
+      .feature-content p {
+        font-size: 16px;
+        line-height: 1.75;
+        color: var(--text-secondary);
+        margin-bottom: 28px;
+      }
+      .feature-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+      .pill::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--blue);
+      }
+
+      /* CATEGORIES MARQUEE */
+      .marquee-section {
+        padding: 80px 0;
+        overflow: hidden;
+        background: var(--off-black);
+      }
+      .marquee-label {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 40px;
+      }
+      .marquee-track {
+        display: flex;
+        gap: 16px;
+        animation: marquee 25s linear infinite;
+        width: max-content;
+      }
+      .marquee-track:hover {
+        animation-play-state: paused;
+      }
+      @keyframes marquee {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      .cat-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        transition: all 0.2s;
+      }
+      .cat-chip:hover {
+        border-color: var(--blue);
+        color: var(--text-primary);
+      }
+      .cat-chip span {
+        font-size: 18px;
+      }
+
+      /* PRICING */
+      .pricing {
+        background: var(--black);
+      }
+      .pricing-header {
+        text-align: center;
+        margin-bottom: 72px;
+      }
+      .pricing-header .section-sub {
+        margin: 0 auto;
+      }
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        max-width: 980px;
+        margin: 0 auto;
+        align-items: start;
+      }
+
+      /* Base card */
+      .price-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        transition:
+          transform 0.25s,
+          box-shadow 0.25s;
+        overflow: visible;
+      }
+      .price-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 24px 56px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Premium card — blue glow, no pseudo-element conflict */
+      .price-card.premium {
+        border-color: var(--blue);
+        box-shadow:
+          0 0 0 1px rgba(1, 100, 255, 0.25),
+          0 20px 56px rgba(1, 100, 255, 0.12);
+      }
+      .price-card.premium:hover {
+        transform: translateY(-5px);
+        box-shadow:
+          0 0 0 1px rgba(1, 100, 255, 0.5),
+          0 28px 64px rgba(1, 100, 255, 0.22);
+      }
+
+      /* Floating badge above card */
+      .plan-float-badge {
+        position: absolute;
+        top: -16px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+      }
+      .plan-float-badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 16px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(1, 100, 255, 0.45);
+        white-space: nowrap;
+      }
+
+      /* Card body */
+      .card-body {
+        padding: 24px 28px 28px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .price-card.premium .card-body {
+        padding-top: 36px;
+      }
+
+      /* Plan name row */
+      .plan-name-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .plan-name {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+      .save-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.22);
+      }
+
+      /* Per-day price */
+      .perday-price {
+        font-size: 62px;
+        font-weight: 900;
+        letter-spacing: -3px;
+        line-height: 1;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+      }
+      .perday-price sup {
+        font-size: 26px;
+        font-weight: 700;
+        vertical-align: top;
+        margin-top: 14px;
+        letter-spacing: 0;
+      }
+      .price-card.premium .perday-price {
+        color: var(--blue);
+      }
+      .perday-label {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .billing-total {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+
+      /* Divider + features */
+      .price-divider {
+        height: 1px;
+        background: var(--border);
+        margin-bottom: 20px;
+      }
+      .price-features {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 24px;
+        flex: 1;
+      }
+      .price-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+      }
+      .check-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: rgba(1, 100, 255, 0.12);
+        border: 1px solid rgba(1, 100, 255, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+      }
+      .check-icon svg {
+        width: 10px;
+        height: 10px;
+      }
+
+      /* Plan buttons */
+      .btn-plan {
+        width: 100%;
+        padding: 15px;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 14px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        transition: all 0.2s;
+        border: none;
+        margin-top: auto;
+      }
+      .btn-plan-premium {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(1, 100, 255, 0.35);
+      }
+      .btn-plan-premium:hover {
+        background: var(--blue-dark);
+        box-shadow: 0 12px 32px rgba(1, 100, 255, 0.5);
+        transform: translateY(-1px);
+      }
+      .btn-plan-blue {
+        background: var(--blue);
+        color: #fff;
+      }
+      .btn-plan-blue:hover {
+        background: var(--blue-dark);
+        transform: translateY(-1px);
+      }
+      .btn-plan-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-hover);
+      }
+      .btn-plan-ghost:hover {
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+
+      /* Trust line */
+      .pricing-trust {
+        text-align: center;
+        margin-top: 36px;
+        font-size: 13px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .pricing-trust-dot {
+        opacity: 0.35;
+      }
+
+      /* TESTIMONIALS */
+      .testimonials {
+        background: var(--off-black);
+      }
+      .testimonials-header {
+        text-align: center;
+        margin-bottom: 64px;
+      }
+      .testimonials-header .section-sub {
+        margin: 0 auto;
+      }
+      .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .review-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px;
+        transition: border-color 0.2s;
+      }
+      .review-card:hover {
+        border-color: var(--border-hover);
+      }
+      .review-stars {
+        display: flex;
+        gap: 3px;
+        margin-bottom: 16px;
+        color: #f5a623;
+        font-size: 14px;
+      }
+      .review-text {
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        font-weight: 400;
+      }
+      .reviewer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .reviewer-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(1, 100, 255, 0.2);
+        border: 1px solid rgba(1, 100, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--blue-light);
+      }
+      .reviewer-name {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .reviewer-role {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      /* CTA BANNER */
+      .cta-section {
+        padding: 100px 5%;
+        text-align: center;
+        background: var(--black);
+        position: relative;
+        overflow: hidden;
+      }
+      .cta-section::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 800px;
+        height: 600px;
+        background: radial-gradient(
+          ellipse,
+          rgba(1, 100, 255, 0.1) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+      .cta-inner {
+        max-width: 700px;
+        margin: 0 auto;
+        position: relative;
+      }
+      .cta-inner h2 {
+        font-size: clamp(38px, 5vw, 62px);
+        font-weight: 900;
+        letter-spacing: -2px;
+        line-height: 1.05;
+        margin-bottom: 20px;
+      }
+      .cta-inner p {
+        font-size: 18px;
+        color: var(--text-secondary);
+        margin-bottom: 44px;
+        line-height: 1.6;
+      }
+      .cta-btns {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* FOOTER */
+      footer {
+        background: var(--off-black);
+        border-top: 1px solid var(--border);
+        padding: 60px 5% 40px;
+      }
+      .footer-inner {
+        max-width: 1300px;
+        margin: 0 auto;
+      }
+      .footer-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 48px;
+        margin-bottom: 48px;
+        flex-wrap: wrap;
+      }
+      .footer-brand {
+        max-width: 280px;
+      }
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .footer-logo img {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+      .footer-logo span {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .footer-brand p {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+      .footer-links {
+        display: flex;
+        gap: 64px;
+        flex-wrap: wrap;
+      }
+      .footer-col h4 {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+      }
+      .footer-col ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .footer-col a {
+        font-size: 14px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .footer-col a:hover {
+        color: var(--text-primary);
+      }
+      .footer-bottom {
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .footer-bottom p {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      .footer-stores {
+        display: flex;
+        gap: 12px;
+      }
+      .store-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .store-badge:hover {
+        background: var(--surface-3);
+        color: var(--text-primary);
+      }
+
+      /* FADE IN ANIMATIONS */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-up {
+        animation: fadeUp 0.7s ease forwards;
+        opacity: 0;
+      }
+      .delay-1 {
+        animation-delay: 0.1s;
+      }
+      .delay-2 {
+        animation-delay: 0.2s;
+      }
+      .delay-3 {
+        animation-delay: 0.3s;
+      }
+      .delay-4 {
+        animation-delay: 0.45s;
+      }
+      .delay-5 {
+        animation-delay: 0.6s;
+      }
+
+      /* DIVIDER LINE */
+      .thin-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 0 5%;
+      }
+
+      /* RESPONSIVE */
+
+      /* Tablet landscape */
+      @media (max-width: 1024px) {
+        .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+        .hero-right { display: none; }
+        .how-grid { grid-template-columns: 1fr; }
+        .feature-row { grid-template-columns: 1fr; gap: 36px; }
+        .feature-row.reverse { direction: ltr; }
+        .feature-img { max-width: 480px; margin: 0 auto; width: 100%; }
+        .features-list { gap: 90px; }
+        .pricing-grid { grid-template-columns: 1fr; max-width: 460px; }
+        .plan-float-badge { top: -14px; }
+        .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      /* Tablet portrait + large phones */
+      @media (max-width: 768px) {
+        nav { padding: 0 20px; }
+        .nav-links { display: none; }
+        .nav-right { gap: 0; }
+        section { padding: 72px 20px; }
+        .hero { padding: 108px 20px 56px; }
+        .hero-stats { gap: 24px; }
+        .hero-stat strong { font-size: 22px; }
+        .feature-img { max-width: 400px; }
+        .feature-img img { max-height: 580px; }
+        .features-list { gap: 72px; }
+        .reviews-grid { grid-template-columns: 1fr; }
+        footer { padding: 48px 20px 32px; }
+        .footer-top { flex-direction: column; }
+        .footer-links { flex-direction: column; gap: 32px; }
+      }
+
+      /* Mobile phones */
+      @media (max-width: 480px) {
+        section { padding: 60px 16px; }
+        .hero { padding: 96px 16px 48px; }
+        h1.hero-title { letter-spacing: -1.5px; }
+        .hero-sub { font-size: 16px; }
+        .hero-stats { gap: 20px; }
+        .hero-stat strong { font-size: 20px; }
+        .hero-badge { font-size: 11px; padding: 5px 12px; }
+        .store-btn { padding: 11px 16px; }
+        .feature-img { max-width: 320px; }
+        .feature-img img { max-height: 480px; }
+        .features-list { gap: 60px; }
+        .pricing-grid { max-width: 100%; }
+        .pricing-trust { flex-direction: column; gap: 6px; }
+        .pricing-trust-dot { display: none; }
+        .perday-price { font-size: 52px; }
+        .how-card { padding: 32px 24px; }
+        footer { padding: 40px 16px 28px; }
+        .footer-stores { flex-wrap: wrap; }
+        .cta-inner h2 { letter-spacing: -1.5px; }
+        .cta-btns { flex-direction: column; align-items: center; }
+        .store-btn { width: 100%; max-width: 280px; justify-content: center; }
+      }
+
+      /* Small phones */
+      @media (max-width: 375px) {
+        .feature-img { max-width: 280px; }
+        .feature-img img { max-height: 420px; }
+        .perday-price { font-size: 46px; }
+        .hero-stats { flex-direction: column; gap: 12px; }
+        .pricing-grid { gap: 14px; }
+      }
+
+      /* LIGHT MODE COMPONENT OVERRIDES */
+      @media (prefers-color-scheme: light) {
+        .how-card:hover {
+          background: var(--surface-3);
+        }
+        .review-card:hover {
+          border-color: var(--border-hover);
+        }
+        .how-icon {
+          background: rgba(1, 100, 255, 0.08);
+          border-color: rgba(1, 100, 255, 0.18);
+        }
+        .hero-badge {
+          background: rgba(1, 100, 255, 0.08);
+          border-color: rgba(1, 100, 255, 0.2);
+        }
+        .pill::before {
+          background: var(--blue);
+        }
+        .reviewer-avatar {
+          background: rgba(1, 100, 255, 0.1);
+          border-color: rgba(1, 100, 255, 0.2);
+        }
+        .feature-img::before {
+          background: radial-gradient(
+            ellipse,
+            rgba(1, 100, 255, 0.14) 0%,
+            transparent 70%
+          );
+        }
+        .hero::before {
+          background: radial-gradient(
+            circle,
+            rgba(1, 100, 255, 0.07) 0%,
+            transparent 70%
+          );
+        }
+        .cta-section::before {
+          background: radial-gradient(
+            ellipse,
+            rgba(1, 100, 255, 0.07) 0%,
+            transparent 60%
+          );
+        }
+        .save-badge {
+          background: rgba(161, 98, 7, 0.08);
+          color: #92400e;
+          border-color: rgba(161, 98, 7, 0.15);
+        }
+        .price-card:hover {
+          box-shadow: 0 24px 56px rgba(0, 0, 0, 0.08);
+        }
+        .price-card.premium {
+          box-shadow:
+            0 0 0 1px rgba(1, 100, 255, 0.3),
+            0 16px 48px rgba(1, 100, 255, 0.08);
+        }
+        .price-card.premium:hover {
+          box-shadow:
+            0 0 0 1px rgba(1, 100, 255, 0.5),
+            0 24px 56px rgba(1, 100, 255, 0.12);
+        }
+        .btn-plan-ghost {
+          color: var(--text-muted);
+        }
+        .btn-plan-ghost:hover {
+          color: var(--text-primary);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a class="nav-logo" href="#">
+        <img src="assets/icon.png" alt="Booksify logo" />
+        <span>Booksify</span>
+      </a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#reviews">Reviews</a></li>
+        </ul>
+        <div class="nav-cta">
+          <a
+            href="https://apps.apple.com/az/app/booksify/id6759565415"
+            class="btn-primary"
+            target="_blank"
+            >Download Free</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-badge fade-up delay-1">
+            Book summaries · Audio & Text
+          </div>
+          <h1 class="hero-title fade-up delay-2">
+            Read Smarter,<br /><span class="accent">Grow Faster</span>
+          </h1>
+          <p class="hero-sub fade-up delay-3">
+            Get the key ideas from the world's best nonfiction books in 15
+            minutes. Listen or read — your choice. Turn every commute into a
+            learning session.
+          </p>
+          <div class="hero-actions fade-up delay-4">
+            <a class="store-img-btn" href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank">
+              <picture>
+                <source media="(prefers-color-scheme: light)" srcset="assets/app_store_black.png">
+                <img src="assets/app_store_white.png" alt="Download on the App Store">
+              </picture>
+            </a>
+            <a class="store-img-btn" href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank">
+              <picture>
+                <source media="(prefers-color-scheme: light)" srcset="assets/play_store_black.png">
+                <img src="assets/play_store_white.png" alt="Get it on Google Play">
+              </picture>
+            </a>
+          </div>
+          <div class="hero-stats fade-up delay-5">
+            <div class="hero-stat">
+              <strong>2000+</strong><span>Book summaries</span>
+            </div>
+            <div class="hero-stat">
+              <strong>15 min</strong><span>Per book idea</span>
+            </div>
+            <div class="hero-stat">
+              <strong>4.9★</strong><span>App Store rating</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right fade-up delay-3">
+          <img
+            src="assets/main_hero.png"
+            alt="Booksify app on multiple phones"
+          />
+        </div>
+      </div>
+    </section>
+
+    <div class="thin-divider"></div>
+
+    <!-- HOW IT WORKS -->
+    <section class="how" id="how">
+      <div class="section-inner">
+        <p class="section-label">How it works</p>
+        <h2 class="section-title">Three steps to<br />daily wisdom</h2>
+        <div class="how-grid">
+          <div class="how-card">
+            <div class="how-number">Step 01</div>
+            <div class="how-icon">📚</div>
+            <h3>Pick a book or category</h3>
+            <p>
+              Browse hundreds of curated summaries across Business, Finance,
+              Self-Help, and more. Discover what top readers are learning this
+              week.
+            </p>
+          </div>
+          <div class="how-card">
+            <div class="how-number">Step 02</div>
+            <div class="how-icon">🎧</div>
+            <h3>Listen or read in 15 minutes</h3>
+            <p>
+              Every summary is available as both audio and text. Sync seamlessly
+              between the two — listen on your commute, read at your desk.
+            </p>
+          </div>
+          <div class="how-card">
+            <div class="how-number">Step 03</div>
+            <div class="how-icon">💡</div>
+            <h3>Learn the words as you go</h3>
+            <p>
+              Tap any word to get instant definitions with translations into
+              your language. Built-in vocabulary learning while you absorb
+              ideas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="thin-divider"></div>
+
+    <!-- CATEGORIES MARQUEE -->
+    <div class="marquee-section">
+      <p class="marquee-label">Categories you'll love</p>
+      <div style="overflow: hidden">
+        <div class="marquee-track" id="marquee">
+          <span class="cat-chip"><span>💼</span> Business</span>
+          <span class="cat-chip"><span>💰</span> Finance</span>
+          <span class="cat-chip"><span>🧠</span> Psychology</span>
+          <span class="cat-chip"><span>🚀</span> Entrepreneurship</span>
+          <span class="cat-chip"><span>🎯</span> Self Help</span>
+          <span class="cat-chip"><span>💻</span> Computer Science</span>
+          <span class="cat-chip"><span>📈</span> Economics</span>
+          <span class="cat-chip"><span>🎨</span> Creativity</span>
+          <span class="cat-chip"><span>🎓</span> Education</span>
+          <span class="cat-chip"><span>🤝</span> Communication</span>
+          <span class="cat-chip"><span>⚖️</span> Decision Making</span>
+          <span class="cat-chip"><span>💼</span> Marketing</span>
+          <span class="cat-chip"><span>🧬</span> Science</span>
+          <span class="cat-chip"><span>🏆</span> Leadership</span>
+          <!-- Duplicated for seamless loop -->
+          <span class="cat-chip"><span>💼</span> Business</span>
+          <span class="cat-chip"><span>💰</span> Finance</span>
+          <span class="cat-chip"><span>🧠</span> Psychology</span>
+          <span class="cat-chip"><span>🚀</span> Entrepreneurship</span>
+          <span class="cat-chip"><span>🎯</span> Self Help</span>
+          <span class="cat-chip"><span>💻</span> Computer Science</span>
+          <span class="cat-chip"><span>📈</span> Economics</span>
+          <span class="cat-chip"><span>🎨</span> Creativity</span>
+          <span class="cat-chip"><span>🎓</span> Education</span>
+          <span class="cat-chip"><span>🤝</span> Communication</span>
+          <span class="cat-chip"><span>⚖️</span> Decision Making</span>
+          <span class="cat-chip"><span>💼</span> Marketing</span>
+          <span class="cat-chip"><span>🧬</span> Science</span>
+          <span class="cat-chip"><span>🏆</span> Leadership</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="thin-divider"></div>
+
+    <!-- FEATURES -->
+    <section id="features">
+      <div class="section-inner">
+        <p class="section-label">Features</p>
+        <h2 class="section-title">
+          Everything you need<br />to learn every day
+        </h2>
+        <div class="features-list">
+          <!-- Feature 1 -->
+          <div class="feature-row">
+            <div class="feature-img">
+              <img
+                src="assets/explore_by_categories.png"
+                alt="Explore screen with book categories"
+              />
+            </div>
+            <div class="feature-content">
+              <span class="feature-tag">Discover</span>
+              <h3>Explore hundreds of books by category</h3>
+              <p>
+                Browse a hand-curated library of the world's most impactful
+                books. Filter by Financial Mindset, Self Help, Entrepreneurship,
+                and more. New titles added weekly.
+              </p>
+              <div class="feature-pills">
+                <span class="pill">2000+ summaries</span>
+                <span class="pill">New books weekly</span>
+                <span class="pill">Editor-curated</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-row reverse">
+            <div class="feature-img">
+              <img
+                src="assets/audio_and_text_sync.png"
+                alt="Audio player with read-along text"
+              />
+            </div>
+            <div class="feature-content">
+              <span class="feature-tag">Listen & Read</span>
+              <h3>Audio and text — perfectly in sync</h3>
+              <p>
+                Follow along as words highlight in real time while audio plays.
+                Switch between reading and listening without losing your place.
+                Control playback speed for faster learning.
+              </p>
+              <div class="feature-pills">
+                <span class="pill">Synchronized highlighting</span>
+                <span class="pill">Speed control</span>
+                <span class="pill">Offline mode</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-row">
+            <div class="feature-img">
+              <img
+                src="assets/learn_new_words.png"
+                alt="Dictionary popup with translation"
+              />
+            </div>
+            <div class="feature-content">
+              <span class="feature-tag">Vocabulary</span>
+              <h3>Learn new words in your language</h3>
+              <p>
+                Tap any unfamiliar word while reading and get an instant
+                definition, pronunciation, and translation. Built-in
+                multilingual dictionary helps non-native readers absorb more.
+              </p>
+              <div class="feature-pills">
+                <span class="pill">Tap-to-define</span>
+                <span class="pill">Native translations</span>
+                <span class="pill">Pronunciations</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="feature-row reverse">
+            <div class="feature-img">
+              <img
+                src="assets/curated_reading_path.png"
+                alt="Home screen with collections"
+              />
+            </div>
+            <div class="feature-content">
+              <span class="feature-tag">Collections</span>
+              <h3>Curated reading paths for every goal</h3>
+              <p>
+                Collections group books into guided journeys — Maps of Wisdom,
+                Financial Mindset, and more. Follow a structured path or create
+                your own reading plan with weekly goals.
+              </p>
+              <div class="feature-pills">
+                <span class="pill">Guided collections</span>
+                <span class="pill">Reading plans</span>
+                <span class="pill">Progress tracking</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="thin-divider"></div>
+
+    <!-- PRICING -->
+    <section class="pricing" id="pricing">
+      <div class="section-inner">
+        <div class="pricing-header">
+          <p class="section-label">Pricing</p>
+          <h2 class="section-title">One price.<br />Everything included.</h2>
+          <p class="section-sub">
+            All plans unlock 2000+ summaries, audio &amp; text mode, and
+            built-in dictionary. No hidden fees, cancel anytime.
+          </p>
+        </div>
+        <div class="pricing-grid">
+          <!-- Weekly -->
+          <div class="price-card">
+            <div class="card-body">
+              <div class="plan-name-row">
+                <span class="plan-name">Weekly</span>
+              </div>
+              <div class="perday-price"><sup>$</sup>0.71</div>
+              <div class="perday-label">per day</div>
+              <div class="billing-total">$4.99 billed weekly</div>
+              <div class="price-divider"></div>
+              <ul class="price-features">
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#0164FF"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Full access to all summaries
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#0164FF"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Audio &amp; text mode
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#0164FF"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Built-in dictionary
+                </li>
+              </ul>
+              <a
+                href="https://apps.apple.com/az/app/booksify/id6759565415"
+                class="btn-plan btn-plan-ghost"
+                target="_blank"
+                >Try Weekly — $4.99</a
+              >
+            </div>
+          </div>
+
+          <!-- 3 Months — Best Value (center) -->
+          <div class="price-card premium">
+            <div class="plan-float-badge">
+              <span class="plan-float-badge-pill">✦ Best Value</span>
+            </div>
+            <div class="card-body">
+              <div class="plan-name-row">
+                <span class="plan-name">3 Months</span>
+                <span class="save-badge">Save 61%</span>
+              </div>
+              <div class="perday-price"><sup>$</sup>0.27</div>
+              <div class="perday-label">per day</div>
+              <div class="billing-total">$24.99 every 3 months</div>
+              <div class="price-divider"></div>
+              <ul class="price-features">
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#818cf8"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Everything in Monthly
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#818cf8"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Lowest price per day
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#818cf8"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Priority new releases
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#818cf8"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Exclusive collections
+                </li>
+              </ul>
+              <a
+                href="https://apps.apple.com/az/app/booksify/id6759565415"
+                class="btn-plan btn-plan-premium"
+                target="_blank"
+                >🔒 Start with 3 Months</a
+              >
+            </div>
+          </div>
+
+          <!-- Monthly -->
+          <div class="price-card">
+            <div class="card-body">
+              <div class="plan-name-row">
+                <span class="plan-name">Monthly</span>
+                <span class="save-badge">Save 53%</span>
+              </div>
+              <div class="perday-price"><sup>$</sup>0.33</div>
+              <div class="perday-label">per day</div>
+              <div class="billing-total">$9.99 billed monthly</div>
+              <div class="price-divider"></div>
+              <ul class="price-features">
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#0164FF"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Everything in Weekly
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#0164FF"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Reading plans &amp; goals
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#0164FF"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Curated collections
+                </li>
+                <li>
+                  <div class="check-icon">
+                    <svg viewBox="0 0 10 10" fill="none">
+                      <path
+                        d="M2 5l2.5 2.5L8 3"
+                        stroke="#0164FF"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  Offline downloads
+                </li>
+              </ul>
+              <a
+                href="https://apps.apple.com/az/app/booksify/id6759565415"
+                class="btn-plan btn-plan-blue"
+                target="_blank"
+                >Start Monthly — $9.99</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <p class="pricing-trust">
+          <span>🔒 Cancel anytime</span>
+          <span class="pricing-trust-dot">·</span>
+          <span>7-day free trial</span>
+          <span class="pricing-trust-dot">·</span>
+          <span>No credit card required</span>
+        </p>
+      </div>
+    </section>
+
+    <div class="thin-divider"></div>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials" id="reviews">
+      <div class="section-inner">
+        <div class="testimonials-header">
+          <p class="section-label">Reviews</p>
+          <h2 class="section-title">Loved by readers worldwide</h2>
+          <p class="section-sub">
+            Join thousands of curious minds who grow with Booksify every day.
+          </p>
+        </div>
+        <div class="reviews-grid">
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "I've always wanted to read more but never had the time. Booksify
+              changed that. I get through 3–4 books a week now — on my commute,
+              at the gym, everywhere."
+            </p>
+            <div class="reviewer">
+              <div class="reviewer-avatar">AH</div>
+              <div>
+                <div class="reviewer-name">Anar H.</div>
+                <div class="reviewer-role">Software Engineer, Baku</div>
+              </div>
+            </div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "The built-in dictionary with Azerbaijani translations is
+              incredible. I improve my English vocabulary while absorbing
+              knowledge from the best books in the world."
+            </p>
+            <div class="reviewer">
+              <div class="reviewer-avatar">LM</div>
+              <div>
+                <div class="reviewer-name">Leyla M.</div>
+                <div class="reviewer-role">Marketing Manager</div>
+              </div>
+            </div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "Switched from Blinkist and haven't looked back. The audio sync
+              while reading is seamless, the UI is clean, and the book selection
+              is exactly what I need."
+            </p>
+            <div class="reviewer">
+              <div class="reviewer-avatar">RK</div>
+              <div>
+                <div class="reviewer-name">Ruslan K.</div>
+                <div class="reviewer-role">Entrepreneur</div>
+              </div>
+            </div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "The Collections feature is brilliant. I followed the Financial
+              Mindset path and it completely changed how I think about money.
+              Finished 15 books in a month."
+            </p>
+            <div class="reviewer">
+              <div class="reviewer-avatar">NJ</div>
+              <div>
+                <div class="reviewer-name">Nigar J.</div>
+                <div class="reviewer-role">Business Analyst</div>
+              </div>
+            </div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "Reading plan feature keeps me accountable. Set a weekly goal, get
+              reminders, track progress. It's like having a personal reading
+              coach in my pocket."
+            </p>
+            <div class="reviewer">
+              <div class="reviewer-avatar">TO</div>
+              <div>
+                <div class="reviewer-name">Tural O.</div>
+                <div class="reviewer-role">Product Manager</div>
+              </div>
+            </div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "Best $9.99 I spend every month. The summaries are genuinely
+              insightful — not just dry bullet points. Feels like having a smart
+              friend explain every book to you."
+            </p>
+            <div class="reviewer">
+              <div class="reviewer-avatar">SM</div>
+              <div>
+                <div class="reviewer-name">Samira M.</div>
+                <div class="reviewer-role">Founder & CEO</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="thin-divider"></div>
+
+    <!-- CTA SECTION -->
+    <section class="cta-section">
+      <div class="cta-inner">
+        <h2>Start reading smarter<br />today — it's free</h2>
+        <p>
+          Download Booksify and get your first summaries free. No credit card
+          required.
+        </p>
+        <div class="cta-btns">
+          <a class="store-img-btn" href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank">
+            <picture>
+              <source media="(prefers-color-scheme: light)" srcset="assets/app_store_black.png">
+              <img src="assets/app_store_white.png" alt="Download on the App Store">
+            </picture>
+          </a>
+          <a class="store-img-btn" href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank">
+            <picture>
+              <source media="(prefers-color-scheme: light)" srcset="assets/play_store_black.png">
+              <img src="assets/play_store_white.png" alt="Get it on Google Play">
+            </picture>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <img src="assets/icon.png" alt="Booksify" />
+              <span>Booksify</span>
+            </div>
+            <p>
+              Learn the key ideas from the world's best books in minutes. Audio,
+              text, and built-in dictionary — all in one app.
+            </p>
+          </div>
+          <div class="footer-links">
+            <div class="footer-col">
+              <h4>Product</h4>
+              <ul>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how">How it works</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+              </ul>
+            </div>
+            <div class="footer-col">
+              <h4>Download</h4>
+              <ul>
+                <li>
+                  <a
+                    href="https://apps.apple.com/az/app/booksify/id6759565415"
+                    target="_blank"
+                    >iOS App Store</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.booksify.summary"
+                    target="_blank"
+                    >Google Play</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="footer-col">
+              <h4>Legal</h4>
+              <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Use</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>© 2026 Booksify. All rights reserved.</p>
+          <div class="footer-stores">
+            <a class="store-img-btn store-img-btn-sm" href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank">
+              <picture>
+                <source media="(prefers-color-scheme: light)" srcset="assets/app_store_black.png">
+                <img src="assets/app_store_white.png" alt="Download on the App Store">
+              </picture>
+            </a>
+            <a class="store-img-btn store-img-btn-sm" href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank">
+              <picture>
+                <source media="(prefers-color-scheme: light)" srcset="assets/play_store_black.png">
+                <img src="assets/play_store_white.png" alt="Get it on Google Play">
+              </picture>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Intersection Observer for scroll-triggered fade-in
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((el) => {
+            if (el.isIntersecting) {
+              el.target.style.opacity = "1";
+              el.target.style.transform = "translateY(0)";
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+
+      document
+        .querySelectorAll(".how-card, .feature-row, .price-card, .review-card")
+        .forEach((el) => {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(28px)";
+          el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+          observer.observe(el);
+        });
+
+      // Stagger pricing cards
+      document.querySelectorAll(".price-card").forEach((el, i) => {
+        el.style.transitionDelay = `${i * 0.08}s`;
+      });
+
+      // Nav background on scroll
+      const nav = document.querySelector("nav");
+      window.addEventListener("scroll", () => {
+        nav.classList.toggle("scrolled", window.scrollY > 40);
+      });
+    </script>
+  </body>
 </html>
