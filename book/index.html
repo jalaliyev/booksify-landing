@@ -782,7 +782,7 @@
       // ── Fetch ───────────────────────────────────────────────────────────────
       async function loadBook(bookId) {
         try {
-          const res = await fetch(`${API_BASE}/books/${bookId}`);
+          const res = await fetch(`${API_BASE}/books/public/${bookId}`);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const book = await res.json();
           renderBook(book);
