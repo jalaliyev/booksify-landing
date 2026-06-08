@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Dynamic OG tags — filled by JS after API fetch -->
+    <title>Booksify</title>
+    <meta name="description" content="Read smarter with Booksify book summaries." />
+    <meta property="og:site_name" content="Booksify" />
+    <meta property="og:type" content="website" />
+    <meta id="og-title" property="og:title" content="Booksify" />
+    <meta id="og-description" property="og:description" content="Read smarter with Booksify." />
+    <meta id="og-image" property="og:image" content="" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="../assets/icon.png" />
+
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --blue: #0164ff;
+        --blue-dark: #0050cc;
+        --blue-light: #3d86ff;
+        --black: #0a0a0a;
+        --off-black: #111111;
+        --surface: #161616;
+        --surface-2: #1e1e1e;
+        --surface-3: #242424;
+        --border: rgba(255,255,255,0.08);
+        --border-hover: rgba(255,255,255,0.15);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255,255,255,0.6);
+        --text-muted: rgba(255,255,255,0.35);
+        --font: "Inter", -apple-system, sans-serif;
+        --nav-bg: rgba(10,10,10,0.8);
+        --nav-bg-scrolled: rgba(10,10,10,0.95);
+        --accent: #888888;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --black: #ffffff;
+          --off-black: #f5f5f7;
+          --surface: #ffffff;
+          --surface-2: #efefef;
+          --surface-3: #e5e5ea;
+          --border: rgba(0,0,0,0.08);
+          --border-hover: rgba(0,0,0,0.18);
+          --text-primary: #0a0a0a;
+          --text-secondary: rgba(0,0,0,0.55);
+          --text-muted: rgba(0,0,0,0.38);
+          --nav-bg: rgba(255,255,255,0.85);
+          --nav-bg-scrolled: rgba(255,255,255,0.97);
+        }
+      }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: var(--font);
+        background: var(--black);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* ── NAV ── */
+      nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 100;
+        padding: 0 5%;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--nav-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        transition: background 0.3s;
+      }
+      nav.scrolled { background: var(--nav-bg-scrolled); }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .nav-logo img { width: 36px; height: 36px; border-radius: 9px; }
+      .nav-logo span {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.3px;
+      }
+      .nav-right { display: flex; gap: 10px; align-items: center; }
+      .btn-outline {
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        background: transparent;
+        border: 1px solid var(--border-hover);
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .btn-outline:hover { background: var(--surface-2); }
+      .btn-primary {
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--blue);
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .btn-primary:hover { background: var(--blue-dark); }
+
+      /* ── SKELETON ── */
+      .skeleton {
+        background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.6s infinite;
+        border-radius: 8px;
+      }
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      /* ── ERROR STATE ── */
+      .error-state {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        padding: 40px 20px;
+        text-align: center;
+      }
+      .error-state .error-icon { font-size: 48px; }
+      .error-state h2 { font-size: 22px; font-weight: 700; }
+      .error-state p { color: var(--text-secondary); font-size: 15px; }
+
+      /* ── PAGE WRAPPER ── */
+      .page { padding-top: 64px; }
+
+      /* ── BOOK HEADER ── */
+      .book-header {
+        position: relative;
+        padding: 48px 5% 0;
+        overflow: hidden;
+      }
+
+      /* accent glow behind the card — color set by JS */
+      .book-header-glow {
+        position: absolute;
+        top: 0; left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 300px;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.18;
+        pointer-events: none;
+        background: var(--accent);
+        transition: background 0.6s;
+      }
+
+      .book-header-inner {
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ── BOOK CARD ── */
+      .book-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 32px;
+        display: flex;
+        gap: 28px;
+        align-items: flex-start;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* left-edge accent stripe */
+      .book-card::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 4px;
+        background: var(--accent);
+        border-radius: 24px 0 0 24px;
+        transition: background 0.6s;
+      }
+
+      /* subtle inner glow from accent */
+      .book-card-glow {
+        position: absolute;
+        top: -60px; left: -60px;
+        width: 260px; height: 260px;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.12;
+        pointer-events: none;
+        background: var(--accent);
+        transition: background 0.6s;
+      }
+
+      .book-cover-wrap {
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+      }
+      .book-cover {
+        width: 120px;
+        aspect-ratio: 2/3;
+        border-radius: 12px;
+        object-fit: cover;
+        display: block;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      }
+      .book-cover-skeleton {
+        width: 120px;
+        height: 180px;
+        border-radius: 12px;
+      }
+
+      .book-meta { flex: 1; min-width: 0; position: relative; z-index: 1; }
+
+      .book-categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      .category-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+      }
+
+      .book-title {
+        font-size: clamp(20px, 3vw, 30px);
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        line-height: 1.15;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+      }
+      .book-author {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+      }
+      .book-subtitle {
+        font-size: 14px;
+        line-height: 1.65;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        max-width: 520px;
+      }
+
+      .book-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+      .stat-icon {
+        width: 28px; height: 28px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      /* skeleton rows */
+      .skel-title { height: 32px; width: 70%; margin-bottom: 10px; }
+      .skel-author { height: 18px; width: 30%; margin-bottom: 12px; }
+      .skel-sub { height: 14px; width: 90%; margin-bottom: 6px; }
+      .skel-sub2 { height: 14px; width: 60%; margin-bottom: 20px; }
+      .skel-stats { height: 28px; width: 200px; }
+
+      /* ── DIVIDER LINE ── */
+      .section-divider {
+        max-width: 900px;
+        margin: 0 auto;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── BODY CONTENT ── */
+      .book-body {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 5% 80px;
+      }
+
+      .content-section { padding: 32px 0; border-bottom: 1px solid var(--border); }
+      .content-section:last-child { border-bottom: none; }
+
+      .section-heading {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 16px;
+      }
+
+      .about-text {
+        font-size: 15px;
+        line-height: 1.8;
+        color: var(--text-secondary);
+        max-height: 120px;
+        overflow: hidden;
+        position: relative;
+        transition: max-height 0.4s ease;
+      }
+      .about-text.expanded { max-height: 2000px; }
+      .about-text:not(.expanded)::after {
+        content: "";
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 50px;
+        background: linear-gradient(transparent, var(--black));
+      }
+      @media (prefers-color-scheme: light) {
+        .about-text:not(.expanded)::after {
+          background: linear-gradient(transparent, var(--black));
+        }
+      }
+      .read-more-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--blue);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        transition: opacity 0.2s;
+      }
+      .read-more-btn:hover { opacity: 0.75; }
+
+      /* ── CHAPTERS ── */
+      .chapters-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .chapter-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        transition: background 0.2s;
+        cursor: default;
+      }
+      .chapter-item:hover { background: var(--surface-2); }
+      .chapter-num {
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        transition: background 0.3s, color 0.3s, border-color 0.3s;
+      }
+      .chapter-title {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+      .chapter-arrow {
+        color: var(--text-muted);
+        font-size: 11px;
+        flex-shrink: 0;
+      }
+
+      /* ── DOWNLOAD BANNER ── */
+      .download-banner {
+        margin: 32px 0 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .download-banner-left h3 {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        margin-bottom: 6px;
+      }
+      .download-banner-left p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+      .download-banner-btns {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+      }
+      .store-img-btn {
+        display: inline-block;
+        text-decoration: none;
+        transition: transform 0.2s, opacity 0.2s;
+      }
+      .store-img-btn:hover { transform: translateY(-2px); opacity: 0.88; }
+      .store-img-btn img { display: block; height: 40px; width: auto; }
+
+      /* ── FADE IN ANIMATION ── */
+      .fade-in {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 640px) {
+        .book-card { flex-direction: column; gap: 20px; padding: 20px; }
+        .book-cover { width: 90px; }
+        .book-cover-skeleton { width: 90px; height: 135px; }
+        .book-stats { gap: 12px; }
+        .download-banner { flex-direction: column; align-items: flex-start; }
+        .download-banner-btns { width: 100%; }
+        nav { padding: 0 4%; }
+        .book-header { padding: 32px 4% 0; }
+        .book-body { padding: 0 4% 60px; }
+        .btn-outline { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- NAV -->
+    <nav id="nav">
+      <a href="/" class="nav-logo">
+        <img src="../assets/icon.png" alt="Booksify" />
+        <span>Booksify</span>
+      </a>
+      <div class="nav-right">
+        <a href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank" class="btn-outline">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank" class="btn-primary">Get the App</a>
+      </div>
+    </nav>
+
+    <!-- PAGE -->
+    <div class="page" id="page">
+
+      <!-- LOADING STATE -->
+      <div id="loading-state">
+        <div class="book-header">
+          <div class="book-header-inner">
+            <div class="book-card">
+              <div class="book-cover-wrap">
+                <div class="book-cover-skeleton skeleton"></div>
+              </div>
+              <div class="book-meta" style="flex:1">
+                <div class="skeleton skel-title"></div>
+                <div class="skeleton skel-author"></div>
+                <div class="skeleton skel-sub"></div>
+                <div class="skeleton skel-sub2"></div>
+                <div class="skeleton skel-stats"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="max-width:900px;margin:32px auto;padding:0 5%">
+          <div class="skeleton" style="height:14px;width:100%;margin-bottom:10px;border-radius:6px"></div>
+          <div class="skeleton" style="height:14px;width:85%;margin-bottom:10px;border-radius:6px"></div>
+          <div class="skeleton" style="height:14px;width:92%;margin-bottom:10px;border-radius:6px"></div>
+          <div class="skeleton" style="height:14px;width:60%;border-radius:6px"></div>
+        </div>
+      </div>
+
+      <!-- ERROR STATE -->
+      <div id="error-state" style="display:none">
+        <div class="error-state">
+          <div class="error-icon">📚</div>
+          <h2>Book not found</h2>
+          <p>This book may have been removed or the link may be invalid.</p>
+          <a href="/" class="btn-primary" style="margin-top:8px">Go to Booksify</a>
+        </div>
+      </div>
+
+      <!-- CONTENT STATE -->
+      <div id="content-state" style="display:none">
+        <div class="book-header">
+          <div class="book-header-glow" id="header-glow"></div>
+          <div class="book-header-inner">
+            <div class="book-card fade-in" id="book-card">
+              <div class="book-card-glow" id="card-glow"></div>
+              <div class="book-cover-wrap">
+                <img class="book-cover" id="book-cover" src="" alt="" />
+              </div>
+              <div class="book-meta">
+                <div class="book-categories" id="book-categories"></div>
+                <h1 class="book-title" id="book-title"></h1>
+                <p class="book-author" id="book-author"></p>
+                <p class="book-subtitle" id="book-subtitle"></p>
+                <div class="book-stats" id="book-stats"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 0 5%">
+          <div class="section-divider"></div>
+        </div>
+
+        <div class="book-body">
+
+          <!-- About -->
+          <div class="content-section fade-in">
+            <p class="section-heading">About this book</p>
+            <div class="about-text" id="about-text"></div>
+            <button class="read-more-btn" id="read-more-btn" onclick="toggleAbout()">
+              Show more <span id="read-more-arrow">↓</span>
+            </button>
+          </div>
+
+          <!-- Chapters -->
+          <div class="content-section fade-in">
+            <p class="section-heading">What's inside</p>
+            <div class="chapters-list" id="chapters-list"></div>
+          </div>
+
+          <!-- About Author -->
+          <div class="content-section fade-in" id="author-section">
+            <p class="section-heading">About the author</p>
+            <div class="about-text" id="author-text"></div>
+            <button class="read-more-btn" id="author-more-btn" onclick="toggleAuthor()">
+              Show more <span id="author-more-arrow">↓</span>
+            </button>
+          </div>
+
+          <!-- Download Banner -->
+          <div class="download-banner fade-in">
+            <div class="download-banner-left">
+              <h3>Read the full summary</h3>
+              <p>Get audio, text sync, and key ideas — free on Booksify.</p>
+            </div>
+            <div class="download-banner-btns">
+              <a class="store-img-btn" href="https://apps.apple.com/az/app/booksify/id6759565415" target="_blank">
+                <picture>
+                  <source media="(prefers-color-scheme: light)" srcset="../assets/app_store_black.png">
+                  <img src="../assets/app_store_white.png" alt="Download on the App Store">
+                </picture>
+              </a>
+              <a class="store-img-btn" href="https://play.google.com/store/apps/details?id=com.booksify.summary" target="_blank">
+                <picture>
+                  <source media="(prefers-color-scheme: light)" srcset="../assets/play_store_black.png">
+                  <img src="../assets/play_store_white.png" alt="Get it on Google Play">
+                </picture>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /page -->
+
+    <script>
+      const API_BASE = 'https://books-i41p.onrender.com';
+
+      // ── Extract bookId from path: /book/{id} ────────────────────────────────
+      function getBookId() {
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        // path is /book/{id}
+        const idx = parts.indexOf('book');
+        return idx !== -1 && parts[idx + 1] ? parts[idx + 1] : null;
+      }
+
+      // ── Smart app redirect (only on mobile) ────────────────────────────────
+      function attemptAppOpen(bookId) {
+        const ua = navigator.userAgent;
+        const isIOS = /iPhone|iPad|iPod/.test(ua);
+        const isAndroid = /Android/.test(ua);
+        if (!isIOS && !isAndroid) return;
+
+        const storeUrl = isIOS
+          ? 'https://apps.apple.com/az/app/booksify/id6759565415'
+          : 'https://play.google.com/store/apps/details?id=com.booksify.summary';
+
+        // If app is installed, Universal Links / App Links handle it automatically.
+        // This timer fires only if the app did NOT intercept — i.e. not installed.
+        const timer = setTimeout(() => {
+          window.location.href = storeUrl;
+        }, 2000);
+
+        window.addEventListener('pagehide', () => clearTimeout(timer));
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) clearTimeout(timer);
+        });
+      }
+
+      // ── Hex color helper ────────────────────────────────────────────────────
+      function hexToRgb(hex) {
+        if (!hex) return null;
+        const clean = hex.replace('#', '');
+        const num = parseInt(clean, 16);
+        return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+      }
+
+      function applyAccentColor(hex) {
+        if (!hex) return;
+        const color = hex.startsWith('#') ? hex : '#' + hex;
+        document.documentElement.style.setProperty('--accent', color);
+        const rgb = hexToRgb(color);
+        if (!rgb) return;
+        // Apply to chapter numbers
+        document.querySelectorAll('.chapter-num').forEach(el => {
+          el.style.background = `rgba(${rgb.r},${rgb.g},${rgb.b},0.12)`;
+          el.style.borderColor = `rgba(${rgb.r},${rgb.g},${rgb.b},0.25)`;
+          el.style.color = color;
+        });
+      }
+
+      // ── Toggle about ────────────────────────────────────────────────────────
+      let aboutExpanded = false;
+      function toggleAbout() {
+        aboutExpanded = !aboutExpanded;
+        document.getElementById('about-text').classList.toggle('expanded', aboutExpanded);
+        document.getElementById('read-more-btn').innerHTML = aboutExpanded
+          ? 'Show less <span>↑</span>'
+          : 'Show more <span>↓</span>';
+      }
+
+      let authorExpanded = false;
+      function toggleAuthor() {
+        authorExpanded = !authorExpanded;
+        document.getElementById('author-text').classList.toggle('expanded', authorExpanded);
+        document.getElementById('author-more-btn').innerHTML = authorExpanded
+          ? 'Show less <span>↑</span>'
+          : 'Show more <span>↓</span>';
+      }
+
+      // ── Render ──────────────────────────────────────────────────────────────
+      function renderBook(book) {
+        // OG meta
+        document.title = `${book.title} — Booksify`;
+        document.querySelector('#og-title').content = `${book.title} by ${book.author} — Booksify`;
+        document.querySelector('#og-description').content = book.subtitle || book.about || '';
+        document.querySelector('#og-image').content = book.coverUrl || '';
+
+        // Cover
+        const cover = document.getElementById('book-cover');
+        cover.src = book.coverUrl;
+        cover.alt = book.title;
+
+        // Categories
+        const catsEl = document.getElementById('book-categories');
+        (book.categories || []).slice(0, 3).forEach(cat => {
+          const chip = document.createElement('span');
+          chip.className = 'category-chip';
+          chip.textContent = cat;
+          catsEl.appendChild(chip);
+        });
+
+        // Title / author / subtitle
+        document.getElementById('book-title').textContent = book.title;
+        document.getElementById('book-author').textContent = `By ${book.author}`;
+        document.getElementById('book-subtitle').textContent = book.subtitle || '';
+
+        // Stats
+        const statsEl = document.getElementById('book-stats');
+        const readMins = book.readingTime ? Math.max(1, Math.floor(book.readingTime / 60)) : null;
+        const statsData = [
+          readMins ? { icon: '⏱', label: `${readMins} min read` } : null,
+          book.chapters?.length ? { icon: '📖', label: `${book.chapters.length} chapters` } : null,
+          book.keyIdeas ? { icon: '💡', label: `${book.keyIdeas} key ideas` } : null,
+        ].filter(Boolean);
+
+        statsData.forEach(s => {
+          const el = document.createElement('div');
+          el.className = 'stat-item';
+          el.innerHTML = `<span class="stat-icon">${s.icon}</span><span>${s.label}</span>`;
+          statsEl.appendChild(el);
+        });
+
+        // About
+        document.getElementById('about-text').textContent = book.about || '';
+
+        // Chapters
+        const chaptersEl = document.getElementById('chapters-list');
+        (book.chapters || []).forEach((ch, i) => {
+          const item = document.createElement('div');
+          item.className = 'chapter-item';
+          item.innerHTML = `
+            <div class="chapter-num">${i + 1}</div>
+            <div class="chapter-title">${ch.title}</div>
+            <div class="chapter-arrow">›</div>
+          `;
+          chaptersEl.appendChild(item);
+        });
+
+        // About author
+        if (book.aboutAuthor) {
+          document.getElementById('author-text').textContent = book.aboutAuthor;
+        } else {
+          document.getElementById('author-section').style.display = 'none';
+        }
+
+        // Accent color
+        if (book.dominantColor) {
+          applyAccentColor(book.dominantColor);
+        }
+
+        // Show content
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('content-state').style.display = 'block';
+
+        // Trigger fade-ins staggered
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.fade-in').forEach((el, i) => {
+            setTimeout(() => el.classList.add('visible'), i * 80);
+          });
+        });
+      }
+
+      // ── Fetch ───────────────────────────────────────────────────────────────
+      async function loadBook(bookId) {
+        try {
+          const res = await fetch(`${API_BASE}/books/${bookId}`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const book = await res.json();
+          renderBook(book);
+        } catch (e) {
+          console.error('[Booksify] Failed to load book:', e);
+          document.getElementById('loading-state').style.display = 'none';
+          document.getElementById('error-state').style.display = 'block';
+        }
+      }
+
+      // ── Nav scroll ──────────────────────────────────────────────────────────
+      window.addEventListener('scroll', () => {
+        document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+      });
+
+      // ── Init ────────────────────────────────────────────────────────────────
+      const bookId = getBookId();
+      if (!bookId) {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('error-state').style.display = 'block';
+      } else {
+        attemptAppOpen(bookId);
+        loadBook(bookId);
+      }
+    </script>
+  </body>
+</html>
