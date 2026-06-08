@@ -1,0 +1,10 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.booksify.summary",
+      "sha256_cert_fingerprints": [
+        "24:0A:15:FE:0C:FF:7A:10:90:A7:78:35:86:E3:33:EF:A6:64:BD:71:67:D4:38:47:66:8A:CC:AA:2F:0F:4E:6F" 
+      ]
+    }
+  }]

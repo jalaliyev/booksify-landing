@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [{
+      "appIDs": ["B94BS99UQY.com.booksify.summary"],
+      "components": [
+        { "/": "/book/*" }
+      ]
+    }]
+  }
+}
