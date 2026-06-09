@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deleting Account – Booksify</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="../assets/icon.png" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --black: #0a0a0a;
+        --surface: #161616;
+        --border: rgba(255, 255, 255, 0.08);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.6);
+        --font: "Inter", -apple-system, sans-serif;
+        --nav-bg: rgba(10, 10, 10, 0.8);
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --black: #ffffff;
+          --surface: #ffffff;
+          --border: rgba(0, 0, 0, 0.08);
+          --text-primary: #0a0a0a;
+          --text-secondary: rgba(0, 0, 0, 0.55);
+          --nav-bg: rgba(255, 255, 255, 0.85);
+        }
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--black);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card {
+        text-align: center;
+        padding: 48px 40px;
+        animation: fadeUp 0.5s ease forwards;
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--border);
+        border-top-color: #ef4444;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 24px;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      h1 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.3px;
+      }
+
+      p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="spinner"></div>
+      <h1>Deleting your account…</h1>
+      <p>Please wait, this will only take a moment.</p>
+    </div>
+
+    <script>
+      (async () => {
+        const params = new URLSearchParams(window.location.search);
+        const token  = params.get("token");
+
+        if (!token) {
+          window.location.href = "./result.html?status=invalid";
+          return;
+        }
+
+        try {
+          // Backend redirect — follow it to the result page
+          const res = await fetch(
+            `https://books-i41p.onrender.com/auth/confirm-delete?token=${encodeURIComponent(token)}`,
+            {
+              method: "GET",
+              redirect: "follow",
+            }
+          );
+
+          // The backend redirects to result.html?status=...
+          // If fetch followed the redirect, extract status from final URL
+          if (res.redirected) {
+            const finalUrl  = new URL(res.url);
+            const status    = finalUrl.searchParams.get("status") ?? "invalid";
+            window.location.href = `./result.html?status=${status}`;
+            return;
+          }
+
+          // Fallback: check HTTP status
+          if (res.ok) {
+            window.location.href = "./result.html?status=success";
+          } else {
+            window.location.href = "./result.html?status=invalid";
+          }
+
+        } catch {
+          window.location.href = "./result.html?status=invalid";
+        }
+      })();
+    </script>
+  </body>
+</html>

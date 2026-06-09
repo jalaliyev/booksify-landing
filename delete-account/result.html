@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Deletion – Booksify</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="../assets/icon.png" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --blue: #0164ff;
+        --blue-dark: #0050cc;
+        --red: #ef4444;
+        --green: #22c55e;
+        --green-surface: rgba(34, 197, 94, 0.08);
+        --green-border: rgba(34, 197, 94, 0.2);
+        --black: #0a0a0a;
+        --surface: #161616;
+        --surface-2: #1e1e1e;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(255, 255, 255, 0.15);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.6);
+        --text-muted: rgba(255, 255, 255, 0.35);
+        --font: "Inter", -apple-system, sans-serif;
+        --nav-bg: rgba(10, 10, 10, 0.8);
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --black: #ffffff;
+          --surface: #ffffff;
+          --surface-2: #efefef;
+          --border: rgba(0, 0, 0, 0.08);
+          --border-hover: rgba(0, 0, 0, 0.18);
+          --text-primary: #0a0a0a;
+          --text-secondary: rgba(0, 0, 0, 0.55);
+          --text-muted: rgba(0, 0, 0, 0.38);
+          --nav-bg: rgba(255, 255, 255, 0.85);
+          --green-surface: rgba(34, 197, 94, 0.06);
+          --green-border: rgba(34, 197, 94, 0.18);
+        }
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--black);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 100;
+        padding: 0 5%;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        background: var(--nav-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+      .nav-logo img { width: 44px; height: 44px; border-radius: 11px; }
+      .nav-logo span { font-size: 19px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+
+      main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 20px 80px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 460px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 48px 40px;
+        text-align: center;
+        animation: fadeUp 0.6s ease forwards;
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .icon-wrap {
+        width: 72px; height: 72px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 28px;
+      }
+      .icon-wrap svg { width: 32px; height: 32px; }
+
+      .icon-success {
+        background: var(--green-surface);
+        border: 1px solid var(--green-border);
+        color: var(--green);
+      }
+      .icon-error {
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        color: var(--red);
+      }
+
+      h1 {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        margin-bottom: 12px;
+        line-height: 1.2;
+      }
+      p {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+      }
+
+      .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+      .btn {
+        display: inline-block;
+        padding: 13px 28px;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: var(--font);
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+      }
+      .btn-primary {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(1, 100, 255, 0.28);
+      }
+      .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-hover);
+      }
+      .btn-ghost:hover { background: var(--surface-2); color: var(--text-primary); }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 24px 5%;
+        text-align: center;
+      }
+      footer p { font-size: 13px; color: var(--text-muted); }
+      footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+      footer a:hover { color: var(--text-secondary); }
+
+      @media (max-width: 540px) {
+        .card { padding: 36px 24px; border-radius: 20px; }
+        main { padding: 100px 16px 60px; }
+        nav { padding: 0 20px; }
+      }
+
+      /* Hidden by default — JS shows the right state */
+      .state { display: none; }
+      .state.active { display: block; }
+    </style>
+  </head>
+  <body>
+
+    <nav>
+      <a class="nav-logo" href="../index.html">
+        <img src="../assets/icon.png" alt="Booksify logo" />
+        <span>Booksify</span>
+      </a>
+    </nav>
+
+    <main>
+      <div class="card">
+
+        <!-- SUCCESS -->
+        <div class="state" id="stateSuccess">
+          <div class="icon-wrap icon-success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          </div>
+          <h1>Account deleted</h1>
+          <p>Your account and all associated data have been permanently deleted. We're sorry to see you go.</p>
+          <div class="divider"></div>
+          <a class="btn btn-ghost" href="../index.html">← Back to Booksify</a>
+        </div>
+
+        <!-- EXPIRED -->
+        <div class="state" id="stateExpired">
+          <div class="icon-wrap icon-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
+          </div>
+          <h1>Link expired</h1>
+          <p>This deletion link has expired — links are only valid for 1 hour. Please go back and request a new one.</p>
+          <div class="divider"></div>
+          <a class="btn btn-primary" href="./index.html">Request a new link</a>
+        </div>
+
+        <!-- INVALID -->
+        <div class="state" id="stateInvalid">
+          <div class="icon-wrap icon-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M15 9l-6 6M9 9l6 6"/>
+            </svg>
+          </div>
+          <h1>Invalid link</h1>
+          <p>This deletion link is not valid. It may have already been used, or the URL was modified.</p>
+          <div class="divider"></div>
+          <a class="btn btn-ghost" href="../index.html">← Back to Booksify</a>
+        </div>
+
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        © 2026 Booksify ·
+        <a href="../privacy/index.html">Privacy Policy</a> ·
+        <a href="../terms/index.html">Terms of Use</a>
+      </p>
+    </footer>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get("status"); // "success" | "expired" | "invalid"
+
+      const map = {
+        success: "stateSuccess",
+        expired: "stateExpired",
+        invalid: "stateInvalid",
+      };
+
+      const id = map[status] ?? "stateInvalid";
+      document.getElementById(id).classList.add("active");
+    </script>
+  </body>
+</html>
