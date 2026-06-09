@@ -16,22 +16,18 @@
 
       :root {
         --black: #0a0a0a;
-        --surface: #161616;
         --border: rgba(255, 255, 255, 0.08);
         --text-primary: #ffffff;
         --text-secondary: rgba(255, 255, 255, 0.6);
         --font: "Inter", -apple-system, sans-serif;
-        --nav-bg: rgba(10, 10, 10, 0.8);
       }
 
       @media (prefers-color-scheme: light) {
         :root {
           --black: #ffffff;
-          --surface: #ffffff;
           --border: rgba(0, 0, 0, 0.08);
           --text-primary: #0a0a0a;
           --text-secondary: rgba(0, 0, 0, 0.55);
-          --nav-bg: rgba(255, 255, 255, 0.85);
         }
       }
 
@@ -68,9 +64,7 @@
         margin: 0 auto 24px;
       }
 
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
+      @keyframes spin { to { transform: rotate(360deg); } }
 
       h1 {
         font-size: 20px;
@@ -94,45 +88,16 @@
     </div>
 
     <script>
-      (async () => {
-        const params = new URLSearchParams(window.location.search);
-        const token  = params.get("token");
+      const params = new URLSearchParams(window.location.search);
+      const token  = params.get("token");
 
-        if (!token) {
-          window.location.href = "./result.html?status=invalid";
-          return;
-        }
-
-        try {
-          // Backend redirect — follow it to the result page
-          const res = await fetch(
-            `https://books-i41p.onrender.com/auth/confirm-delete?token=${encodeURIComponent(token)}`,
-            {
-              method: "GET",
-              redirect: "follow",
-            }
-          );
-
-          // The backend redirects to result.html?status=...
-          // If fetch followed the redirect, extract status from final URL
-          if (res.redirected) {
-            const finalUrl  = new URL(res.url);
-            const status    = finalUrl.searchParams.get("status") ?? "invalid";
-            window.location.href = `./result.html?status=${status}`;
-            return;
-          }
-
-          // Fallback: check HTTP status
-          if (res.ok) {
-            window.location.href = "./result.html?status=success";
-          } else {
-            window.location.href = "./result.html?status=invalid";
-          }
-
-        } catch {
-          window.location.href = "./result.html?status=invalid";
-        }
-      })();
+      if (!token) {
+        window.location.href = "./result.html?status=invalid";
+      } else {
+        window.location.href =
+          "https://books-i41p.onrender.com/auth/confirm-delete?token=" +
+          encodeURIComponent(token);
+      }
     </script>
   </body>
 </html>
