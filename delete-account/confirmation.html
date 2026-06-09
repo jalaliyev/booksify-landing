@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check Your Email – Booksify</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="../assets/icon.png" />
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --blue: #0164ff;
+        --blue-dark: #0050cc;
+        --black: #0a0a0a;
+        --off-black: #111111;
+        --surface: #161616;
+        --surface-2: #1e1e1e;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(255, 255, 255, 0.15);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.6);
+        --text-muted: rgba(255, 255, 255, 0.35);
+        --font: "Inter", -apple-system, sans-serif;
+        --nav-bg: rgba(10, 10, 10, 0.8);
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --black: #ffffff;
+          --off-black: #f5f5f7;
+          --surface: #ffffff;
+          --surface-2: #efefef;
+          --border: rgba(0, 0, 0, 0.08);
+          --border-hover: rgba(0, 0, 0, 0.18);
+          --text-primary: #0a0a0a;
+          --text-secondary: rgba(0, 0, 0, 0.55);
+          --text-muted: rgba(0, 0, 0, 0.38);
+          --nav-bg: rgba(255, 255, 255, 0.85);
+        }
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--black);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 100;
+        padding: 0 5%;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        background: var(--nav-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .nav-logo img { width: 44px; height: 44px; border-radius: 11px; }
+      .nav-logo span { font-size: 19px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+
+      main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 20px 80px;
+        position: relative;
+        overflow: hidden;
+      }
+      main::before {
+        content: "";
+        position: absolute;
+        top: -100px; left: 50%;
+        transform: translateX(-50%);
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(1, 100, 255, 0.07) 0%, transparent 65%);
+        pointer-events: none;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 480px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 48px 40px;
+        text-align: center;
+        animation: fadeUp 0.6s ease forwards;
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .envelope {
+        width: 72px; height: 72px;
+        border-radius: 20px;
+        background: rgba(1, 100, 255, 0.1);
+        border: 1px solid rgba(1, 100, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 28px;
+      }
+      .envelope svg { width: 30px; height: 30px; color: var(--blue); }
+
+      .card h1 {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        margin-bottom: 12px;
+      }
+      .card p {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+      }
+      .email-highlight {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 28px 0;
+      }
+
+      .tips {
+        list-style: none;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+      .tips li {
+        font-size: 13px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        line-height: 1.5;
+      }
+      .tips li::before {
+        content: "·";
+        flex-shrink: 0;
+        color: var(--blue);
+        font-weight: 700;
+        line-height: 1.5;
+      }
+
+      .btn-back {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: var(--font);
+        color: var(--text-secondary);
+        background: transparent;
+        border: 1px solid var(--border-hover);
+        border-radius: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+        text-align: center;
+      }
+      .btn-back:hover {
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 24px 5%;
+        text-align: center;
+      }
+      footer p { font-size: 13px; color: var(--text-muted); }
+      footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+      footer a:hover { color: var(--text-secondary); }
+
+      @media (max-width: 540px) {
+        .card { padding: 36px 24px; border-radius: 20px; }
+        main { padding: 100px 16px 60px; }
+        nav { padding: 0 20px; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav>
+      <a class="nav-logo" href="../index.html">
+        <img src="../assets/icon.png" alt="Booksify logo" />
+        <span>Booksify</span>
+      </a>
+    </nav>
+
+    <main>
+      <div class="card">
+        <div class="envelope">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M2 7l10 7 10-7"/>
+          </svg>
+        </div>
+
+        <h1>Check your email</h1>
+        <p>
+          We sent a deletion confirmation link to
+          <span class="email-highlight" id="emailDisplay">your email address</span>.
+          Click the link in that email to permanently delete your account.
+        </p>
+
+        <div class="divider"></div>
+
+        <ul class="tips">
+          <li>The link expires in 1 hour for security</li>
+          <li>Check your spam or junk folder if you don't see it</li>
+          <li>Your account remains active until you click the link</li>
+        </ul>
+
+        <a class="btn-back" href="../index.html">← Back to Booksify</a>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        © 2026 Booksify ·
+        <a href="../privacy/index.html">Privacy Policy</a> ·
+        <a href="../terms/index.html">Terms of Use</a>
+      </p>
+    </footer>
+
+    <script>
+      // Pull email from query param and display it
+      const params = new URLSearchParams(window.location.search);
+      const email  = params.get('email');
+      const el     = document.getElementById('emailDisplay');
+      if (email) el.textContent = email;
+    </script>
+  </body>
+</html>
